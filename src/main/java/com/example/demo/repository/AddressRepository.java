@@ -1,0 +1,36 @@
+package com.example.demo.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import com.example.demo.model.AddressModel;
+
+import jakarta.transaction.Transactional;
+
+public interface AddressRepository extends JpaRepository<AddressModel, Long>{
+
+	@Query(value="SELECT * from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
+	public List<AddressModel> getAllSiteData(String deploymentId);
+	
+	@Modifying(clearAutomatically = true)
+	@Transactional
+	@Query(value="Update address_data m SET m.street_name=?1,m.city=?2,m.pin_code=?3,m.state=?4 WHERE m.deployment_id=?5",nativeQuery = true)
+	public void updateNewSite(String siteName,String city,String pinCode,String state,String deploymentId);
+	
+	@Modifying(clearAutomatically = true)
+	@Transactional
+	@Query(value="DELETE m from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
+	public void deleteData(String deploymentId);
+	
+	@Query(value="SELECT * from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
+	public List<AddressModel> getSiteData(String deploymentId);
+	
+	@Query(value="SELECT m.city from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
+	public String cityName(String deploymentId);
+	
+	@Query(value="SELECT * from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
+	public AddressModel getSpecificSite(String deploymentId);
+}
