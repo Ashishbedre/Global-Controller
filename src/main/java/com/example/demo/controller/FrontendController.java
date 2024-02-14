@@ -42,11 +42,11 @@ public class FrontendController {
 	frontendService service;
 
 	
-	// To get the tenant of the list
-	@GetMapping("/get_tenant")
-	public List<TenantDto> getAllTenantId() {
-		return backendService.getListOfTenant();
-	}
+//	// To get the tenant of the list
+//	@GetMapping("/get_tenant")
+//	public List<TenantDto> getAllTenantId() {
+//		return backendService.getListOfTenant();
+//	}
 
 	
 	// To save the version information of the sites
@@ -104,41 +104,47 @@ public class FrontendController {
 //		return backendService.getAllData(tenantId);
 //	}
 
-	// To get the details of all the sites in the site list of the provision site list.
-	@GetMapping("/provision/site_list/get_all_provisioned_site/tenant_id={tenant_id}")
-	public List<SiteListDto> getAllSite(@PathVariable("tenant_id") String tenantId) {
-		return service.getAllSiteList(tenantId);
-	}
+//	Ashish comment
+// 	To get the details of all the sites in the site list of the provision site list.
+//	@GetMapping("/provision/site_list/get_all_provisioned_site/tenant_id={tenant_id}")
+//	public List<SiteListDto> getAllSite(@PathVariable("tenant_id") String tenantId) {
+//		return service.getAllSiteList(tenantId);
+//	}
 
-	// To get the list of all sites in the provision list of site list
-	@GetMapping("/provision/site_list/get_site_details/deployment_id={deployment_id}")
-	public ProvisionSiteDto getSiteList(@PathVariable("deployment_id") String deploymentId) {
-		return service.getSiteList(deploymentId);
-	}
+//Ashish comment
+//	// To get the list of all sites in the provision list of site list
+//	@GetMapping("/provision/site_list/get_site_details/deployment_id={deployment_id}")
+//	public ProvisionSiteDto getSiteList(@PathVariable("deployment_id") String deploymentId) {
+//		return service.getSiteList(deploymentId);
+//	}
 
-	// To update the details in the sites according to the deployment id of the site.
-	@PutMapping("/provision/site_list/update_site_details/deployment_id={deployment_id}")
-	public void updateExistingSite(@RequestBody ProvisionDtoUpdate provisionDto,@PathVariable("deployment_id") String deploymentId) {
-		service.UpdateExisitingSite(provisionDto, deploymentId);
-	}
+//	Ashish comment
+//	// To update the details in the sites according to the deployment id of the site.
+//	@PutMapping("/provision/site_list/update_site_details/deployment_id={deployment_id}")
+//	public void updateExistingSite(@RequestBody ProvisionDtoUpdate provisionDto,@PathVariable("deployment_id") String deploymentId) {
+//		service.UpdateExisitingSite(provisionDto, deploymentId);
+//	}
 
-	// To get the list of all site version in the provision list of site list
-	@GetMapping("/provision/site_list/get_version_control_provisioned_site/deployment_id={deployment_id}")
-	public VersionUpdateControlDto getVersionData(@PathVariable("deployment_id") String deploymentId) {
-		return service.getListOfVersion(deploymentId);
-	}
+//	Ashish comment
+//	// To get the list of all site version in the provision list of site list
+//	@GetMapping("/provision/site_list/get_version_control_provisioned_site/deployment_id={deployment_id}")
+//	public VersionUpdateControlDto getVersionData(@PathVariable("deployment_id") String deploymentId) {
+//		return service.getListOfVersion(deploymentId);
+//	}
 
-	// To save the details of the version in the site list.
-	@PostMapping("/provision/site_list/post_set_version_provisioned")
-	public void saveVersionData(@RequestBody List<VersionControlDataModel> versionControlDataModel) {
-		service.saveVersionData(versionControlDataModel);
-	}
+//	Ashish comment
+//	// To save the details of the version in the site list.
+//	@PostMapping("/provision/site_list/post_set_version_provisioned")
+//	public void saveVersionData(@RequestBody List<VersionControlDataModel> versionControlDataModel) {
+//		service.saveVersionData(versionControlDataModel);
+//	}
 
-	// To delete the sites of the deployment id.
-	@DeleteMapping("/provision/site_list/delete_site/deployment_id={deployment_id}")
-	public void deleteExistingSite(@PathVariable("deployment_id") String deploymentId) {
-		service.deleteExistingSite(deploymentId);
-	}
+//	Ashish comment
+//	// To delete the sites of the deployment id.
+//	@DeleteMapping("/provision/site_list/delete_site/deployment_id={deployment_id}")
+//	public void deleteExistingSite(@PathVariable("deployment_id") String deploymentId) {
+//		service.deleteExistingSite(deploymentId);
+//	}
 
 	// To save the details of the version in the site list.
 	@GetMapping("/provision/site_list/get_set_version_provisioned/deployment_id={deployment_id}")

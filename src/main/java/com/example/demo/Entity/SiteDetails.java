@@ -17,10 +17,10 @@ public class SiteDetails {
 
     private String siteId;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER)
     private List<Address> addresses;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER)
     private List<Person> personsOfContact;
 
     private Boolean provision;

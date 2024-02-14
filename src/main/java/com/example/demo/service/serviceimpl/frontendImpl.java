@@ -29,9 +29,9 @@ import com.example.demo.model.AgentModel;
 import com.example.demo.model.PersonModel;
 import com.example.demo.model.VersionControlDataModel;
 import com.example.demo.model.VersionModel;
-import com.example.demo.repository.AddressRepository;
+import com.example.demo.repository.AddressRepositoryOver;
 import com.example.demo.repository.AgentRepository;
-import com.example.demo.repository.PersonRepository;
+import com.example.demo.repository.PersonRepositoryOver;
 import com.example.demo.repository.UpdatedVersionRepository;
 import com.example.demo.repository.VersionRepository;
 import com.example.demo.repository.VersionSiteRepository;
@@ -51,10 +51,10 @@ public class frontendImpl implements frontendService{
 	AgentRepository agentRepository;
 	
 	@Autowired
-	AddressRepository addressRepository;
+	AddressRepositoryOver addressRepository;
 	
 	@Autowired
-	PersonRepository personRepository;
+	PersonRepositoryOver personRepository;
 	
 	@Autowired
 	VersionSiteRepository versionSiteRepository;

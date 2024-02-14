@@ -1,6 +1,6 @@
 package com.example.demo.service.serviceimpl;
 
-import com.example.demo.Entity.CurrentProductVersion;
+import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
@@ -8,16 +8,21 @@ import com.example.demo.model.AgentModel;
 import com.example.demo.model.VersionModel;
 import com.example.demo.repository1.CurrentProductVersionRepository;
 import com.example.demo.repository1.SiteDetailsRepository;
+import com.example.demo.repository1.UpdateProductVersionRepository;
 import com.example.demo.service.AddSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Service
 public class AddSiteServiceImpl implements AddSiteService {
 
     @Autowired
@@ -25,6 +30,10 @@ public class AddSiteServiceImpl implements AddSiteService {
 
     @Autowired
     CurrentProductVersionRepository currentProductVersionRepository;
+
+    @Autowired
+    UpdateProductVersionRepository updateProductVersionRepository;
+
     @Override
     public List<TenantDto> getListOfTenant() {
         List<TenantDto> temp=new ArrayList<>();
@@ -45,7 +54,7 @@ public class AddSiteServiceImpl implements AddSiteService {
     public List<VersionAddSiteDto> getAllDataProduct(String tenantId) {
         List<VersionAddSiteDto> data=new ArrayList<>();
 
-        List<String> list=siteDetailsRepository.findDeploymentIdByTenantId(tenantId);
+        List<String> list=siteDetailsRepository.findDistinctDeploymentIdsByTenantId(tenantId);
 
         for (String versionModel : list) {
 
@@ -74,8 +83,9 @@ public class AddSiteServiceImpl implements AddSiteService {
         return data;
     }
 
+
     @Override
-    public void saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId) {
+    public VersionUpdateControlDto getListOfUpdatedVersion(String deploymentId) {
 
         VersionUpdateControlDto mmm=new VersionUpdateControlDto();
 
@@ -98,7 +108,7 @@ public class AddSiteServiceImpl implements AddSiteService {
         mmm.setDeploymentId(deploymentId);
 
         WebClient webForStoringDatabse = WebClient.builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://localhost:8080")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
@@ -115,7 +125,7 @@ public class AddSiteServiceImpl implements AddSiteService {
             VersionUpgradeDto model=new VersionUpgradeDto();
 
             model.setProduct_name(dockerVersionInformationDto.getProduct());
-            model.setProduct_current_version(versionRepository.getVersion(deploymentId, dockerVersionInformationDto.getProduct()));
+            model.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
 
             List<VersionInformation> ttt=dockerVersionInformationDto.getVersions();
 
@@ -141,7 +151,74 @@ public class AddSiteServiceImpl implements AddSiteService {
     }
 
     @Override
-    public VersionUpdateControlDto getListOfUpdatedVersion(String deploymentId) {
-        return null;
+    public void saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId) {
+        SiteDetails siteDetails = siteDetailsRepository.findByDeploymentIdAndTenantId(deploymentId, tenantId);
+        if (siteDetails != null) {
+            // Map fields from ProvisionSiteSSDto to SiteDetails
+            siteDetails.setDeploymentId(deploymentId);
+            siteDetails.setTenantId(tenantId);
+            siteDetails.setSiteId(provisionDto.getSiteName());
+            siteDetails.setProvision(true);
+            siteDetails.setAvailable(false);
+            siteDetails.setActive(false);
+
+            // Convert AddressDto list to Address list
+            List<Address> addresses = provisionDto.getAddress().stream()
+                    .map(addressDto -> {
+                        Address address = new Address();
+                        address.setStreetName(addressDto.getStreetName());
+                        address.setCity(addressDto.getCity());
+                        address.setState(addressDto.getState());
+                        address.setCity(addressDto.getCity());
+                        address.setPinCode(addressDto.getPinCode());
+                        address.setSite(siteDetails);
+                        return address;
+                    })
+                    .collect(Collectors.toList());
+            siteDetails.setAddresses(addresses);
+
+            // Convert PersonDto list to Person list
+            List<Person> personsOfContact = provisionDto.getPersonOfContact().stream()
+                    .map(personDto -> {
+                        Person person = new Person();
+                        person.setFullName(personDto.getFullName());
+                        person.setEmail(personDto.getEmail());
+                        person.setContact(personDto.getContact());
+                        person.setSite(siteDetails);
+                        return person;
+                    })
+                    .collect(Collectors.toList());
+            siteDetails.setPersonsOfContact(personsOfContact);
+
+            // Convert VersionSetProductDto list to VersionSetProduct list
+            List<VersionSetProductDto> versionSetProducts = provisionDto.getVersionControl().stream()
+                    .map(versionSetProductDto -> {
+                        VersionSetProductDto versionSetProduct = new VersionSetProductDto();
+                        versionSetProduct.setProductName(versionSetProductDto.getProductName());
+                        versionSetProduct.setProductSetVersion(versionSetProductDto.getProductSetVersion());
+                        return versionSetProduct;
+                    })
+                    .collect(Collectors.toList());
+            // Save the SiteDetails entity
+
+            // Check if the product version exists in CurrentProductVersion
+            Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository.findByDeploymentIdAndProductNameAndProductVersion(
+                    deploymentId,
+                    provisionDto.getVersionControl().get(0).getProductName(),
+                    provisionDto.getVersionControl().get(0).getProductSetVersion()
+            );
+
+            // If version exists, save it to UpdateProductVersion
+            currentVersionOptional.ifPresent(currentProductVersion -> {
+                UpdateProductVersion updateProductVersion = new UpdateProductVersion();
+                siteDetails.setAvailable(false);
+                updateProductVersion.setDeploymentId(currentProductVersion.getDeploymentId());
+                updateProductVersion.setProductName(currentProductVersion.getProductName());
+                updateProductVersion.setProductVersion(currentProductVersion.getProductVersion());
+                updateProductVersionRepository.save(updateProductVersion);
+            });
+            siteDetailsRepository.save(siteDetails);
+
+        }
     }
 }

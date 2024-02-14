@@ -10,7 +10,7 @@ import com.example.demo.model.AddressModel;
 
 import jakarta.transaction.Transactional;
 
-public interface AddressRepository extends JpaRepository<AddressModel, Long>{
+public interface AddressRepositoryOver extends JpaRepository<AddressModel, Long>{
 
 	@Query(value="SELECT * from address_data m WHERE m.deployment_id=?1",nativeQuery = true)
 	public List<AddressModel> getAllSiteData(String deploymentId);
