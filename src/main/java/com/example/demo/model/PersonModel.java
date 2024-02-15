@@ -7,25 +7,25 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name="person_data")
+//@Entity
+//@Table(name="person_data")
 public class PersonModel {
 
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
-	private Long id;
-	@Column(name="full_name")
+
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	@Column(name="id")
+//	private Long id;
+//	@Column(name="full_name")
 	private String fullName;
-	@Column(name="contact")
+//	@Column(name="contact")
 	private String contact;
-	@Column(name="email")
+//	@Column(name="email")
 	private String email;
-	@Column(name="deployment_id")
+//	@Column(name="deployment_id")
 	private String deploymentId;
-	
-	
+
+
 	public String getFullName() {
 		return fullName;
 	}
@@ -50,8 +50,8 @@ public class PersonModel {
 	public void setDeploymentId(String deploymentId) {
 		this.deploymentId = deploymentId;
 	}
-	
-	
+
+
 	public PersonModel(String fullName, String contact, String email, String deploymentId) {
 		super();
 		this.fullName = fullName;
@@ -59,11 +59,11 @@ public class PersonModel {
 		this.email = email;
 		this.deploymentId = deploymentId;
 	}
-	
-	
+
+
 	public PersonModel() {
 		super();
 	}
-	
-	
+
+
 }

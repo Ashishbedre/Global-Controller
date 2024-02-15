@@ -8,7 +8,9 @@ import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
 import com.example.demo.model.*;
+import com.example.demo.repository1.AddressRepository;
 import com.example.demo.repository1.CurrentProductVersionRepository;
+import com.example.demo.repository1.PersonRepository;
 import com.example.demo.repository1.SiteDetailsRepository;
 import com.example.demo.service.SiteListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,12 @@ public class SiteListServiceImpl implements SiteListService {
 
     @Autowired
     SiteDetailsRepository siteDetailsRepository;
+
+    @Autowired
+    AddressRepository addressRepository;
+
+    @Autowired
+    PersonRepository personRepository;
 
     @Autowired
     CurrentProductVersionRepository currentProductVersionRepository;
@@ -210,36 +218,45 @@ public class SiteListServiceImpl implements SiteListService {
 
             // Save the updated entity
             siteDetailsRepository.save(siteDetails);
-        } else {
-            System.out.println("Not available");
         }
+//        else {
+//            siteDetailsRepository.updateSiteDetails(provisionDto.getAddress(),provisionDto.getPersonOfContact(),deploymentId);
+//        }
     }
 
     @Override
     public void deleteExistingSite(String deploymentId) {
-        siteDetailsRepository.deleteByDeploymentId(deploymentId);
+//        SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
+//        addressRepository.delete(siteDetails.getSiteId());
+//        siteDetailsRepository.deleteByDeploymentId(deploymentId);
     }
 
     @Override
     public void saveVersionData(List<VersionControlDataModel> list) {
+        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findAll(); // Fetch all existing entities
+
         for (VersionControlDataModel versionControlDataModel : list) {
-
-            if(!currentProductVersionRepository.existsByDeploymentId(versionControlDataModel.getDeploymentId()))
-            {
-                CurrentProductVersion model=new CurrentProductVersion();
-
+            boolean found = false;
+            for (CurrentProductVersion currentProductVersion : currentProductVersions) {
+                if (versionControlDataModel.getDeploymentId().equals(currentProductVersion.getDeploymentId())) {
+                    // Update existing entity
+                    currentProductVersion.setProductVersion(versionControlDataModel.getProduct_set_version());
+                    currentProductVersion.setProductName(versionControlDataModel.getProduct_name());
+                    // Update other fields if needed
+                    currentProductVersionRepository.save(currentProductVersion);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                // Create a new entity if it doesn't exist
+                CurrentProductVersion model = new CurrentProductVersion();
                 model.setDeploymentId(versionControlDataModel.getDeploymentId());
                 model.setProductVersion(versionControlDataModel.getProduct_set_version());
                 model.setProductName(versionControlDataModel.getProduct_name());
-//                model.setProduct_scheduled_update(versionControlDataModel.getProduct_scheduled_update());
-//                model.setProduct_scheduled_update_dateTime(versionControlDataModel.getProduct_scheduled_update_dateTime());
-
+                // Set other fields if needed
                 currentProductVersionRepository.save(model);
             }
-//            else {
-//
-//                versionSiteRepository.updateVersionInfo(versionControlDataModel.getProduct_set_version(),versionControlDataModel.getProduct_scheduled_update(),versionControlDataModel.getProduct_scheduled_update_dateTime(),versionControlDataModel.getDeploymentId());
-//            }
         }
     }
 }

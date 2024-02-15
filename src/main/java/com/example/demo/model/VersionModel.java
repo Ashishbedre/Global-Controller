@@ -7,27 +7,27 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name="version_data")
+//@Entity
+//@Table(name="version_data")
 public class VersionModel {
 
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
-	private Long id;
-	@Column(name="product_name")
+
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	@Column(name="id")
+//	private Long id;
+//	@Column(name="product_name")
 	private String productName;
-	@Column(name="product_set_version")
+//	@Column(name="product_set_version")
 	private String productSetVersion;
-	@Column(name="deployment_id")
+//	@Column(name="deployment_id")
 	private String deploymentId;
-	@Column(name="tenant_id")
+//	@Column(name="tenant_id")
 	private String tenantId;
-	@Column(name="product_version")
+//	@Column(name="product_version")
 	private String productVersion;
-	
-	
+
+
 	public String getProductName() {
 		return productName;
 	}
@@ -58,8 +58,8 @@ public class VersionModel {
 	public void setProductVersion(String productVersion) {
 		this.productVersion = productVersion;
 	}
-	
-	
+
+
 	public VersionModel(String productName, String productSetVersion, String deploymentId, String tenantId,
 			String productVersion) {
 		super();
@@ -69,15 +69,15 @@ public class VersionModel {
 		this.tenantId = tenantId;
 		this.productVersion = productVersion;
 	}
-	
-	
+
+
 	public VersionModel() {
 		super();
 	}
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 }

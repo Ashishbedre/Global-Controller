@@ -4,7 +4,7 @@ import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
-import com.example.demo.model.AgentModel;
+//import com.example.demo.model.AgentModel;
 import com.example.demo.model.VersionModel;
 import com.example.demo.repository1.CurrentProductVersionRepository;
 import com.example.demo.repository1.SiteDetailsRepository;
@@ -222,3 +222,44 @@ public class AddSiteServiceImpl implements AddSiteService {
         }
     }
 }
+
+
+////Ashish
+//
+//    // Convert VersionSetProductDto list to VersionSetProduct list
+//    List<VersionSetProductDto> versionSetProducts = provisionDto.getVersionControl().stream()
+//            .map(versionSetProductDto -> {
+//                VersionSetProductDto versionSetProduct = new VersionSetProductDto();
+//                versionSetProduct.setProductName(versionSetProductDto.getProductName());
+//                versionSetProduct.setProductSetVersion(versionSetProductDto.getProductSetVersion());
+//                return versionSetProduct;
+//            })
+//            .collect(Collectors.toList());
+//
+//    // Check if the product version exists in CurrentProductVersion
+//    Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository.findByDeploymentIdAndProductName(
+//            deploymentId,
+//            provisionDto.getVersionControl().get(0).getProductName()
+//    );
+//
+//// If version exists, update it
+//currentVersionOptional.ifPresent(currentProductVersion -> {
+//        if (currentProductVersion.getProductVersion().equals(provisionDto.getVersionControl().get(0).getProductSetVersion())) {
+//        // If the product version matches, update the SiteDetails entity
+//        siteDetails.setAvailable(false);
+//        siteDetailsRepository.save(siteDetails);
+//        } else {
+//        // If the product version does not match, save it to UpdateProductVersion
+//        UpdateProductVersion updateProductVersion = new UpdateProductVersion();
+//        siteDetails.setAvailable(false);
+//        updateProductVersion.setDeploymentId(currentProductVersion.getDeploymentId());
+//        updateProductVersion.setProductName(currentProductVersion.getProductName());
+//        updateProductVersion.setProductVersion(currentProductVersion.getProductVersion());
+//        updateProductVersionRepository.save(updateProductVersion);
+//        siteDetailsRepository.save(siteDetails);
+//        }
+//        });
+
+
+
+

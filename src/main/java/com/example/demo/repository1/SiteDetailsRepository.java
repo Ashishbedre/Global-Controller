@@ -1,10 +1,15 @@
 package com.example.demo.repository1;
 
 import com.example.demo.Entity.SiteDetails;
+import com.example.demo.dto.AddressDto;
+import com.example.demo.dto.PersonDto;
+import com.example.demo.dto.ProvisionDtoUpdate;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.Optional;
 
 import java.util.List;
@@ -23,6 +28,7 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     List<String> findDistinctDeploymentIdsByTenantId(String tenantId);
 
     SiteDetails findByDeploymentIdAndTenantId(String deploymentId, String tenantId);
+
 
     @Transactional
     @Modifying
