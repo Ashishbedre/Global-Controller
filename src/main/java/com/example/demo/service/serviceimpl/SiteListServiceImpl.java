@@ -6,12 +6,12 @@ import com.example.demo.Entity.Person;
 import com.example.demo.Entity.SiteDetails;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
+import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
-import com.example.demo.model.*;
-import com.example.demo.repository1.AddressRepository;
-import com.example.demo.repository1.CurrentProductVersionRepository;
-import com.example.demo.repository1.PersonRepository;
-import com.example.demo.repository1.SiteDetailsRepository;
+import com.example.demo.repository.AddressRepository;
+import com.example.demo.repository.CurrentProductVersionRepository;
+import com.example.demo.repository.PersonRepository;
+import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.service.SiteListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -120,13 +120,13 @@ public class SiteListServiceImpl implements SiteListService {
 
         List<VersionUpgradeDto> kkk=new ArrayList<>();
 
-        List<com.example.demo.dto.BackendPackage.VersionControlDto> temp=new ArrayList<>();
+        List<VersionControlMicroDto> temp=new ArrayList<>();
 
         List<CurrentProductVersion> model1=currentProductVersionRepository.findByDeploymentId(deploymentId);
 
         for (CurrentProductVersion versionModel : model1) {
 
-            com.example.demo.dto.BackendPackage.VersionControlDto dd=new com.example.demo.dto.BackendPackage.VersionControlDto();
+            VersionControlMicroDto dd=new VersionControlMicroDto();
 
             dd.setRepo(versionModel.getProductName());
             dd.setTag(versionModel.getProductVersion());

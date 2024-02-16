@@ -2,9 +2,6 @@ package com.example.demo.dto;
 
 import java.util.List;
 
-import com.example.demo.model.AddressModel;
-import com.example.demo.model.PersonModel;
-
 public class ProvisionSiteDto {
 
 	private String siteName;

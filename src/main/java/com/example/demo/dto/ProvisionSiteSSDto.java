@@ -2,10 +2,6 @@ package com.example.demo.dto;
 
 import java.util.List;
 
-import com.example.demo.model.AddressModel;
-import com.example.demo.model.PersonModel;
-import com.example.demo.model.VersionModel;
-
 
 public class ProvisionSiteSSDto {
 

@@ -1,6 +1,6 @@
 package com.example.demo.dto.BackendPackage;
 
-public class VersionControlDto {
+public class VersionControlMicroDto {
 
 	private String repo;
 	private String tag;
@@ -18,13 +18,13 @@ public class VersionControlDto {
 		this.repo = repo;
 	}
 	
-	public VersionControlDto(String tag, String repo) {
+	public VersionControlMicroDto(String tag, String repo) {
 		super();
 		this.tag = tag;
 		this.repo = repo;
 	}
 	
-	public VersionControlDto() {
+	public VersionControlMicroDto() {
 		super();
 	}
 	

@@ -22,8 +22,8 @@
 //import com.example.demo.dto.VersionUpdateControlDto;
 //import com.example.demo.model.AgentModel;
 //import com.example.demo.model.UpdateVersionModel;
-//import com.example.demo.model.VersionControlDataModel;
-//import com.example.demo.model.VersionModel;
+//import com.example.demo.dto.VersionControlDataModel;
+//import com.example.demo.dto.VersionModel;
 //import com.example.demo.service.backendService;
 //import com.example.demo.service.frontendService;
 //

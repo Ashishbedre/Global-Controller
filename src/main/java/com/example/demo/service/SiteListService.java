@@ -4,7 +4,7 @@ import com.example.demo.dto.ProvisionDtoUpdate;
 import com.example.demo.dto.ProvisionSiteDto;
 import com.example.demo.dto.SiteListDto;
 import com.example.demo.dto.VersionUpdateControlDto;
-import com.example.demo.model.VersionControlDataModel;
+import com.example.demo.dto.VersionControlDataModel;
 
 import java.util.List;
 

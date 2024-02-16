@@ -3,16 +3,14 @@ package com.example.demo.service.serviceimpl;
 import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
+import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
 //import com.example.demo.model.AgentModel;
-import com.example.demo.model.VersionModel;
-import com.example.demo.repository1.CurrentProductVersionRepository;
-import com.example.demo.repository1.SiteDetailsRepository;
-import com.example.demo.repository1.UpdateProductVersionRepository;
+import com.example.demo.repository.CurrentProductVersionRepository;
+import com.example.demo.repository.SiteDetailsRepository;
+import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.AddSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,118 +34,90 @@ public class AddSiteServiceImpl implements AddSiteService {
 
     @Override
     public List<TenantDto> getListOfTenant() {
-        List<TenantDto> temp=new ArrayList<>();
-        List<String> list=siteDetailsRepository.findAllDistinctTenantIds();
+        List<TenantDto> temp = siteDetailsRepository.findAllDistinctTenantIds()
+                .stream()
+                .map(string -> {
+                    TenantDto dto = new TenantDto();
+                    dto.setTenantId(string);
+                    return dto;
+                })
+                .collect(Collectors.toList());
 
-        for (String string : list) {
-
-            TenantDto dto=new TenantDto();
-
-            dto.setTenantId(string);
-
-            temp.add(dto);
-        }
         return temp;
     }
 
     @Override
     public List<VersionAddSiteDto> getAllDataProduct(String tenantId) {
-        List<VersionAddSiteDto> data=new ArrayList<>();
+        List<String> deploymentIds = siteDetailsRepository.findDistinctDeploymentIdByTenantIdAndProvisionIsNullTrueOrProvisionIsFalse(tenantId);
 
-        List<String> list=siteDetailsRepository.findDistinctDeploymentIdsByTenantId(tenantId);
+        return deploymentIds.stream()
+                .map(deploymentId -> {
+                    VersionAddSiteDto versionAddSiteDto = new VersionAddSiteDto();
+                    versionAddSiteDto.setDeploymentId(deploymentId);
 
-        for (String versionModel : list) {
+                    List<ProductDto> products = currentProductVersionRepository.findByDeploymentId(deploymentId).stream()
+                            .map(currentProductVersion -> {
+                                ProductDto productDto = new ProductDto();
+                                productDto.setProductName(currentProductVersion.getProductName());
+                                productDto.setProductVersion(currentProductVersion.getProductVersion());
+                                return productDto;
+                            })
+                            .collect(Collectors.toList());
 
-            VersionAddSiteDto model=new VersionAddSiteDto();
-
-            model.setDeploymentId(versionModel);
-
-            List<ProductDto> zxc=new ArrayList<>();
-            List<CurrentProductVersion> qwerty=currentProductVersionRepository.findByDeploymentId(versionModel);
-
-            for (CurrentProductVersion versionModel2 : qwerty) {
-
-                ProductDto modell=new ProductDto();
-
-                modell.setProductName(versionModel2.getProductName());
-                modell.setProductVersion(versionModel2.getProductVersion());
-
-                zxc.add(modell);
-            }
-
-            model.setVersion(zxc);
-
-            data.add(model);
-        }
-
-        return data;
+                    versionAddSiteDto.setVersion(products);
+                    return versionAddSiteDto;
+                })
+                .collect(Collectors.toList());
     }
 
 
     @Override
     public VersionUpdateControlDto getListOfUpdatedVersion(String deploymentId) {
+        VersionUpdateControlDto versionUpdateControlDto = new VersionUpdateControlDto();
+        versionUpdateControlDto.setDeploymentId(deploymentId);
 
-        VersionUpdateControlDto mmm=new VersionUpdateControlDto();
+        List<VersionUpgradeDto> versionUpgradeDtoList = new ArrayList<>();
 
-        List<VersionUpgradeDto> kkk=new ArrayList<>();
+        List<VersionControlMicroDto> versionControlDtoList = currentProductVersionRepository.findByDeploymentId(deploymentId)
+                .stream()
+                .map(versionModel -> {
+                    VersionControlMicroDto versionControlDto = new VersionControlMicroDto();
+                    versionControlDto.setRepo(versionModel.getProductName());
+                    versionControlDto.setTag(versionModel.getProductVersion());
+                    return versionControlDto;
+                })
+                .collect(Collectors.toList());
 
-        List<com.example.demo.dto.BackendPackage.VersionControlDto> temp=new ArrayList<>();
+        WebClient webClient = WebClient.create();
 
-        List<CurrentProductVersion> model1=currentProductVersionRepository.findByDeploymentId(deploymentId);
-
-        for (CurrentProductVersion versionModel : model1) {
-
-            com.example.demo.dto.BackendPackage.VersionControlDto dd=new com.example.demo.dto.BackendPackage.VersionControlDto();
-
-            dd.setRepo(versionModel.getProductName());
-            dd.setTag(versionModel.getProductVersion());
-
-            temp.add(dd);
-        }
-
-        mmm.setDeploymentId(deploymentId);
-
-        WebClient webForStoringDatabse = WebClient.builder()
-                .baseUrl("http://localhost:8080")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        List<DockerVersionInformationDto> list = webForStoringDatabse.post()
-                .uri("v1/globalSDN/SiteManagement/getUpgradeVersion")
+        List<DockerVersionInformationDto> dockerVersionInformationDtoList = webClient.post()
+                .uri("http://localhost:8080/v1/globalSDN/SiteManagement/getUpgradeVersion")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(temp)
+                .bodyValue(versionControlDtoList)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
+                .bodyToFlux(DockerVersionInformationDto.class)
+                .collectList()
                 .block();
 
-        for (DockerVersionInformationDto dockerVersionInformationDto : list) {
+        for (DockerVersionInformationDto dockerVersionInformationDto : dockerVersionInformationDtoList) {
+            VersionUpgradeDto versionUpgradeDto = new VersionUpgradeDto();
+            versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
+            versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
 
-            VersionUpgradeDto model=new VersionUpgradeDto();
+            List<VersionInformation> versionInformationList = dockerVersionInformationDto.getVersions().stream()
+                    .map(versionInformation -> {
+                        VersionInformation newVersionInformation = new VersionInformation();
+                        newVersionInformation.setVersion(versionInformation.getVersion());
+                        return newVersionInformation;
+                    })
+                    .collect(Collectors.toList());
 
-            model.setProduct_name(dockerVersionInformationDto.getProduct());
-            model.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
-
-            List<VersionInformation> ttt=dockerVersionInformationDto.getVersions();
-
-            List<VersionInformation> ppp=new ArrayList<>();
-
-            for (VersionInformation versionInformation : ttt) {
-
-                VersionInformation qqq=new VersionInformation();
-
-                qqq.setVersion(versionInformation.getVersion());
-
-                ppp.add(qqq);
-            }
-
-            model.setProduct_upgrade_available_version(ppp);
-
-            kkk.add(model);
+            versionUpgradeDto.setProduct_upgrade_available_version(versionInformationList);
+            versionUpgradeDtoList.add(versionUpgradeDto);
         }
 
-        mmm.setVersion_control(kkk);
-
-        return mmm;
+        versionUpdateControlDto.setVersion_control(versionUpgradeDtoList);
+        return versionUpdateControlDto;
     }
 
     @Override
@@ -199,24 +169,22 @@ public class AddSiteServiceImpl implements AddSiteService {
                         return versionSetProduct;
                     })
                     .collect(Collectors.toList());
-            // Save the SiteDetails entity
 
-            // Check if the product version exists in CurrentProductVersion
-            Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository.findByDeploymentIdAndProductNameAndProductVersion(
-                    deploymentId,
-                    provisionDto.getVersionControl().get(0).getProductName(),
-                    provisionDto.getVersionControl().get(0).getProductSetVersion()
-            );
+            for (VersionSetProductDto versionSetProductDto : versionSetProducts) {
+                String productName = versionSetProductDto.getProductName();
+                String productVersion = versionSetProductDto.getProductSetVersion();
+                Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository
+                        .findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
+                if (!currentVersionOptional.isPresent()) {
+                    // If version does not exist, save it to UpdateProductVersion
+                    UpdateProductVersion updateProductVersion = new UpdateProductVersion();
+                    updateProductVersion.setDeploymentId(deploymentId);
+                    updateProductVersion.setProductName(productName);
+                    updateProductVersion.setProductVersion(productVersion);
+                    updateProductVersionRepository.save(updateProductVersion);
+                }
+            }
 
-            // If version exists, save it to UpdateProductVersion
-            currentVersionOptional.ifPresent(currentProductVersion -> {
-                UpdateProductVersion updateProductVersion = new UpdateProductVersion();
-                siteDetails.setAvailable(false);
-                updateProductVersion.setDeploymentId(currentProductVersion.getDeploymentId());
-                updateProductVersion.setProductName(currentProductVersion.getProductName());
-                updateProductVersion.setProductVersion(currentProductVersion.getProductVersion());
-                updateProductVersionRepository.save(updateProductVersion);
-            });
             siteDetailsRepository.save(siteDetails);
 
         }

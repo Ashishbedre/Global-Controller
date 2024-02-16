@@ -1,14 +1,10 @@
-package com.example.demo.repository1;
+package com.example.demo.repository;
 
 import com.example.demo.Entity.SiteDetails;
-import com.example.demo.dto.AddressDto;
-import com.example.demo.dto.PersonDto;
-import com.example.demo.dto.ProvisionDtoUpdate;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -26,6 +22,9 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
 
     @Query("SELECT DISTINCT s.deploymentId FROM SiteDetails s WHERE s.tenantId = ?1")
     List<String> findDistinctDeploymentIdsByTenantId(String tenantId);
+
+    @Query("SELECT DISTINCT s.deploymentId FROM SiteDetails s WHERE s.tenantId = ?1 AND (s.provision IS NULL OR s.provision = false)")
+    List<String> findDistinctDeploymentIdByTenantIdAndProvisionIsNullTrueOrProvisionIsFalse(String tenantId);
 
     SiteDetails findByDeploymentIdAndTenantId(String deploymentId, String tenantId);
 
