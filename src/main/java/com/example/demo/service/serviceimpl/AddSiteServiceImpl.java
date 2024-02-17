@@ -129,36 +129,26 @@ public class AddSiteServiceImpl implements AddSiteService {
             siteDetails.setTenantId(tenantId);
             siteDetails.setSiteId(provisionDto.getSiteName());
             siteDetails.setProvision(true);
-            siteDetails.setAvailable(false);
+            siteDetails.setUpdateAvailable(false);
             siteDetails.setActive(false);
 
             // Convert AddressDto list to Address list
-            List<Address> addresses = provisionDto.getAddress().stream()
-                    .map(addressDto -> {
                         Address address = new Address();
-                        address.setStreetName(addressDto.getStreetName());
-                        address.setCity(addressDto.getCity());
-                        address.setState(addressDto.getState());
-                        address.setCity(addressDto.getCity());
-                        address.setPinCode(addressDto.getPinCode());
+                        address.setStreetName(provisionDto.getAddress().getStreetName());
+                        address.setCity(provisionDto.getAddress().getCity());
+                        address.setState(provisionDto.getAddress().getState());
+                        address.setCity(provisionDto.getAddress().getCity());
+                        address.setPinCode(provisionDto.getAddress().getPinCode());
                         address.setSite(siteDetails);
-                        return address;
-                    })
-                    .collect(Collectors.toList());
-            siteDetails.setAddresses(addresses);
+            siteDetails.setAddresses(address);
 
             // Convert PersonDto list to Person list
-            List<Person> personsOfContact = provisionDto.getPersonOfContact().stream()
-                    .map(personDto -> {
                         Person person = new Person();
-                        person.setFullName(personDto.getFullName());
-                        person.setEmail(personDto.getEmail());
-                        person.setContact(personDto.getContact());
+                        person.setFullName(provisionDto.getPersonOfContact().getFullName());
+                        person.setEmail(provisionDto.getPersonOfContact().getEmail());
+                        person.setContact(provisionDto.getPersonOfContact().getContact());
                         person.setSite(siteDetails);
-                        return person;
-                    })
-                    .collect(Collectors.toList());
-            siteDetails.setPersonsOfContact(personsOfContact);
+            siteDetails.setPersonsOfContact(person);
 
             // Convert VersionSetProductDto list to VersionSetProduct list
             List<VersionSetProductDto> versionSetProducts = provisionDto.getVersionControl().stream()
@@ -176,12 +166,16 @@ public class AddSiteServiceImpl implements AddSiteService {
                 Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository
                         .findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
                 if (!currentVersionOptional.isPresent()) {
-                    // If version does not exist, save it to UpdateProductVersion
-                    UpdateProductVersion updateProductVersion = new UpdateProductVersion();
-                    updateProductVersion.setDeploymentId(deploymentId);
-                    updateProductVersion.setProductName(productName);
-                    updateProductVersion.setProductVersion(productVersion);
-                    updateProductVersionRepository.save(updateProductVersion);
+                    Optional<UpdateProductVersion> checkUpdateProductVersion = updateProductVersionRepository
+                            .findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
+                            if(!checkUpdateProductVersion.isPresent()) {
+                                UpdateProductVersion updateProductVersion = new UpdateProductVersion();
+                                updateProductVersion.setDeploymentId(deploymentId);
+                                updateProductVersion.setProductName(productName);
+                                updateProductVersion.setProductVersion(productVersion);
+                                updateProductVersionRepository.save(updateProductVersion);
+                                siteDetails.setUpdateAvailable(true);
+                            }
                 }
             }
 
@@ -190,43 +184,6 @@ public class AddSiteServiceImpl implements AddSiteService {
         }
     }
 }
-
-
-////Ashish
-//
-//    // Convert VersionSetProductDto list to VersionSetProduct list
-//    List<VersionSetProductDto> versionSetProducts = provisionDto.getVersionControl().stream()
-//            .map(versionSetProductDto -> {
-//                VersionSetProductDto versionSetProduct = new VersionSetProductDto();
-//                versionSetProduct.setProductName(versionSetProductDto.getProductName());
-//                versionSetProduct.setProductSetVersion(versionSetProductDto.getProductSetVersion());
-//                return versionSetProduct;
-//            })
-//            .collect(Collectors.toList());
-//
-//    // Check if the product version exists in CurrentProductVersion
-//    Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository.findByDeploymentIdAndProductName(
-//            deploymentId,
-//            provisionDto.getVersionControl().get(0).getProductName()
-//    );
-//
-//// If version exists, update it
-//currentVersionOptional.ifPresent(currentProductVersion -> {
-//        if (currentProductVersion.getProductVersion().equals(provisionDto.getVersionControl().get(0).getProductSetVersion())) {
-//        // If the product version matches, update the SiteDetails entity
-//        siteDetails.setAvailable(false);
-//        siteDetailsRepository.save(siteDetails);
-//        } else {
-//        // If the product version does not match, save it to UpdateProductVersion
-//        UpdateProductVersion updateProductVersion = new UpdateProductVersion();
-//        siteDetails.setAvailable(false);
-//        updateProductVersion.setDeploymentId(currentProductVersion.getDeploymentId());
-//        updateProductVersion.setProductName(currentProductVersion.getProductName());
-//        updateProductVersion.setProductVersion(currentProductVersion.getProductVersion());
-//        updateProductVersionRepository.save(updateProductVersion);
-//        siteDetailsRepository.save(siteDetails);
-//        }
-//        });
 
 
 

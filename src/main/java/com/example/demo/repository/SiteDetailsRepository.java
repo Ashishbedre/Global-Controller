@@ -26,6 +26,9 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     @Query("SELECT DISTINCT s.deploymentId FROM SiteDetails s WHERE s.tenantId = ?1 AND (s.provision IS NULL OR s.provision = false)")
     List<String> findDistinctDeploymentIdByTenantIdAndProvisionIsNullTrueOrProvisionIsFalse(String tenantId);
 
+    @Query("SELECT DISTINCT s FROM SiteDetails s WHERE s.tenantId = ?1 AND s.provision = true")
+    List<SiteDetails> findDistinctDeploymentIdByTenantIdAndProvisionIsTrue(String tenantId);
+
     SiteDetails findByDeploymentIdAndTenantId(String deploymentId, String tenantId);
 
 

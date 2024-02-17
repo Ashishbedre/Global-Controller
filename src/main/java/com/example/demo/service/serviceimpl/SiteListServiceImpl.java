@@ -42,47 +42,31 @@ public class SiteListServiceImpl implements SiteListService {
 
     @Override
     public List<SiteListDto> getAllSiteList(String tenantId) {
+        List<SiteDetails> siteDetailsList = siteDetailsRepository.findDistinctDeploymentIdByTenantIdAndProvisionIsTrue(tenantId);
 
-        List<SiteListDto> data=new ArrayList<>();
+        return siteDetailsList.stream()
+                .map(siteDetails -> {
+                    SiteListDto model = new SiteListDto();
+                    model.setDeploymentId(siteDetails.getDeploymentId());
+                    model.setSiteName(siteDetails.getSiteId());
+                    model.setCity(siteDetails.getAddresses().getCity());
 
-        List<SiteDetails> temp=siteDetailsRepository.findByTenantId(tenantId);
+                    List<VersionProductDto> versionProductDtoList = currentProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId())
+                            .stream()
+                            .map(versionModel -> {
+                                VersionProductDto dto = new VersionProductDto();
+                                dto.setProductName(versionModel.getProductName());
+                                dto.setProductVersion(versionModel.getProductVersion());
+                                return dto;
+                            })
+                            .collect(Collectors.toList());
 
-        for (SiteDetails agentModel : temp) {
-
-            SiteListDto model=new SiteListDto();
-
-            model.setDeploymentId(agentModel.getDeploymentId());
-            model.setSiteName(agentModel.getSiteId());
-            String city="";
-            try {
-                city = agentModel.getAddresses().get(0).getCity();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            model.setCity(city);
-
-            List<VersionProductDto> ppp=new ArrayList<>();
-
-            List<CurrentProductVersion> fff =currentProductVersionRepository.findByDeploymentId(agentModel.getDeploymentId());
-
-            for (CurrentProductVersion versionModel : fff) {
-
-                VersionProductDto dto=new VersionProductDto();
-
-                dto.setProductName(versionModel.getProductName());
-                dto.setProductVersion(versionModel.getProductVersion());
-
-                ppp.add(dto);
-            }
-
-            model.setVersionControl(ppp);
-
-            data.add(model);
-
-        }
-        return data;
-
+                    model.setVersionControl(versionProductDtoList);
+                    return model;
+                })
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public ProvisionSiteDto getSiteList(String deploymentId) {
@@ -90,26 +74,21 @@ public class SiteListServiceImpl implements SiteListService {
         SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
         data.setSiteName(siteDetails.getSiteId());
         //Address
-        List<AddressModel> addressModelsList = new ArrayList<>();
         AddressModel addressModel = new AddressModel();
-        addressModel.setCity(siteDetails.getAddresses().get(siteDetails.getAddresses().size()-1).getCity());
+        addressModel.setCity(siteDetails.getAddresses().getCity());
         addressModel.setDeploymentId(deploymentId);
-        addressModel.setState(siteDetails.getAddresses().get(siteDetails.getAddresses().size()-1).getState());
-        addressModel.setStreetName(siteDetails.getAddresses().get(siteDetails.getAddresses().size()-1).getStreetName());
-        addressModel.setPinCode(siteDetails.getAddresses().get(siteDetails.getAddresses().size()-1).getPinCode());
-        addressModelsList.add(addressModel);
-        data.setAddress(addressModelsList);
+        addressModel.setState(siteDetails.getAddresses().getState());
+        addressModel.setStreetName(siteDetails.getAddresses().getStreetName());
+        addressModel.setPinCode(siteDetails.getAddresses().getPinCode());
+        data.setAddress(addressModel);
 
         //PersonModel
-        List<PersonModel> personModelList = new ArrayList<>();
         PersonModel personModel = new PersonModel();
-        personModel.setContact(siteDetails.getPersonsOfContact().get(siteDetails.getPersonsOfContact().size()-1).getContact());
+        personModel.setContact(siteDetails.getPersonsOfContact().getContact());
         personModel.setDeploymentId(deploymentId);
-        personModel.setEmail(siteDetails.getPersonsOfContact().get(siteDetails.getPersonsOfContact().size()-1).getEmail());
-        personModel.setFullName(siteDetails.getPersonsOfContact().get(siteDetails.getPersonsOfContact().size()-1).getFullName());
-        personModelList.add(personModel);
-
-        data.setPersonOfContact(personModelList);
+        personModel.setEmail(siteDetails.getPersonsOfContact().getEmail());
+        personModel.setFullName(siteDetails.getPersonsOfContact().getFullName());
+        data.setPersonOfContact(personModel);
 
         return data;
     }
@@ -189,32 +168,22 @@ public class SiteListServiceImpl implements SiteListService {
             siteDetails.setSiteId(provisionDto.getSiteName());
 
             // Convert AddressDto list to Address list
-            List<Address> addresses = provisionDto.getAddress().stream()
-                    .map(addressDto -> {
                         Address address = new Address();
-                        address.setStreetName(addressDto.getStreetName());
-                        address.setCity(addressDto.getCity());
-                        address.setState(addressDto.getState());
-                        address.setCity(addressDto.getCity());
-                        address.setPinCode(addressDto.getPinCode());
+                        address.setStreetName(provisionDto.getAddress().getStreetName());
+                        address.setCity(provisionDto.getAddress().getCity());
+                        address.setState(provisionDto.getAddress().getState());
+                        address.setCity(provisionDto.getAddress().getCity());
+                        address.setPinCode(provisionDto.getAddress().getPinCode());
                         address.setSite(siteDetails);
-                        return address;
-                    })
-                    .collect(Collectors.toList());
-            siteDetails.setAddresses(addresses);
+            siteDetails.setAddresses(address);
 
             // Convert PersonDto list to Person list
-            List<Person> personsOfContact = provisionDto.getPersonOfContact().stream()
-                    .map(personDto -> {
                         Person person = new Person();
-                        person.setFullName(personDto.getFullName());
-                        person.setEmail(personDto.getEmail());
-                        person.setContact(personDto.getContact());
+                        person.setFullName(provisionDto.getPersonOfContact().getFullName());
+                        person.setEmail(provisionDto.getPersonOfContact().getEmail());
+                        person.setContact(provisionDto.getPersonOfContact().getContact());
                         person.setSite(siteDetails);
-                        return person;
-                    })
-                    .collect(Collectors.toList());
-            siteDetails.setPersonsOfContact(personsOfContact);
+            siteDetails.setPersonsOfContact(person);
 
             // Save the updated entity
             siteDetailsRepository.save(siteDetails);

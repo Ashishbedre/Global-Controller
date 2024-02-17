@@ -5,8 +5,8 @@ import java.util.List;
 public class ProvisionDtoUpdate {
 
 	private String siteName;
-	private List<AddressDto> address;
-	private List<PersonDto> personOfContact;
+	private AddressDto address;
+	private PersonDto personOfContact;
 	
 	public String getSiteName() {
 		return siteName;
@@ -14,20 +14,20 @@ public class ProvisionDtoUpdate {
 	public void setSiteName(String siteName) {
 		this.siteName = siteName;
 	}
-	public List<AddressDto> getAddress() {
+	public AddressDto getAddress() {
 		return address;
 	}
-	public void setAddress(List<AddressDto> address) {
+	public void setAddress(AddressDto address) {
 		this.address = address;
 	}
-	public List<PersonDto> getPersonOfContact() {
+	public PersonDto getPersonOfContact() {
 		return personOfContact;
 	}
-	public void setPersonOfContact(List<PersonDto> personOfContact) {
+	public void setPersonOfContact(PersonDto personOfContact) {
 		this.personOfContact = personOfContact;
 	}
 	
-	public ProvisionDtoUpdate(String siteName, List<AddressDto> address, List<PersonDto> personOfContact) {
+	public ProvisionDtoUpdate(String siteName, AddressDto address, PersonDto personOfContact) {
 		super();
 		this.siteName = siteName;
 		this.address = address;

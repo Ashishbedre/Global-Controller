@@ -17,15 +17,15 @@ public class SiteDetails {
 
     private String siteId;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER,orphanRemoval = true)
-    private List<Address> addresses;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER,orphanRemoval = true)
+    private Address addresses;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER,orphanRemoval = true)
-    private List<Person> personsOfContact;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "site", fetch = FetchType.EAGER,orphanRemoval = true)
+    private Person personsOfContact;
 
     private Boolean provision;
 
-    private Boolean available;
+    private Boolean updateAvailable;
 
     private Boolean active;
 
@@ -61,19 +61,19 @@ public class SiteDetails {
         this.siteId = siteId;
     }
 
-    public List<Address> getAddresses() {
+    public Address getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(Address addresses) {
         this.addresses = addresses;
     }
 
-    public List<Person> getPersonsOfContact() {
+    public Person getPersonsOfContact() {
         return personsOfContact;
     }
 
-    public void setPersonsOfContact(List<Person> personsOfContact) {
+    public void setPersonsOfContact(Person personsOfContact) {
         this.personsOfContact = personsOfContact;
     }
 
@@ -85,12 +85,12 @@ public class SiteDetails {
         this.provision = provision;
     }
 
-    public Boolean getAvailable() {
-        return available;
+    public Boolean getUpdateAvailable() {
+        return updateAvailable;
     }
 
-    public void setAvailable(Boolean available) {
-        this.available = available;
+    public void setUpdateAvailable(Boolean updateAvailable) {
+        this.updateAvailable = updateAvailable;
     }
 
     public Boolean getActive() {

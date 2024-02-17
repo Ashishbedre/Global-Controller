@@ -6,26 +6,26 @@ import java.util.List;
 public class ProvisionSiteSSDto {
 
 	private String siteName;
-	private List<AddressDto> address;
-	private List<PersonDto> personOfContact;
+	private AddressDto address;
+	private PersonDto personOfContact;
 	private List<VersionSetProductDto> versionControl;
-	
+
 	public String getSiteName() {
 		return siteName;
 	}
 	public void setSiteName(String siteName) {
 		this.siteName = siteName;
 	}
-	public List<AddressDto> getAddress() {
+	public AddressDto getAddress() {
 		return address;
 	}
-	public void setAddress(List<AddressDto> address) {
+	public void setAddress(AddressDto address) {
 		this.address = address;
 	}
-	public List<PersonDto> getPersonOfContact() {
+	public PersonDto getPersonOfContact() {
 		return personOfContact;
 	}
-	public void setPersonOfContact(List<PersonDto> personOfContact) {
+	public void setPersonOfContact(PersonDto personOfContact) {
 		this.personOfContact = personOfContact;
 	}
 	public List<VersionSetProductDto> getVersionControl() {
@@ -34,9 +34,9 @@ public class ProvisionSiteSSDto {
 	public void setVersionControl(List<VersionSetProductDto> versionControl) {
 		this.versionControl = versionControl;
 	}
-	
-	
-	public ProvisionSiteSSDto(String siteName, List<AddressDto> address, List<PersonDto> personOfContact,
+
+
+	public ProvisionSiteSSDto(String siteName, AddressDto address, PersonDto personOfContact,
 			List<VersionSetProductDto> versionControl) {
 		super();
 		this.siteName = siteName;
@@ -44,14 +44,14 @@ public class ProvisionSiteSSDto {
 		this.personOfContact = personOfContact;
 		this.versionControl = versionControl;
 	}
-	
-	
+
+
 	public ProvisionSiteSSDto() {
 		super();
 	}
-		
-	
-	
-	
-	
+
+
+
+
+
 }
