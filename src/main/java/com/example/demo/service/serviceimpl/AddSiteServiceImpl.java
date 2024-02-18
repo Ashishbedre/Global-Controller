@@ -11,6 +11,7 @@ import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.AddSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,6 +32,9 @@ public class AddSiteServiceImpl implements AddSiteService {
 
     @Autowired
     UpdateProductVersionRepository updateProductVersionRepository;
+
+    @Value("${microService.api.url}")
+    private String microServiceTagUrl;
 
     @Override
     public List<TenantDto> getListOfTenant() {
@@ -91,7 +95,7 @@ public class AddSiteServiceImpl implements AddSiteService {
         WebClient webClient = WebClient.create();
 
         List<DockerVersionInformationDto> dockerVersionInformationDtoList = webClient.post()
-                .uri("http://localhost:8080/v1/globalSDN/SiteManagement/getUpgradeVersion")
+                .uri(microServiceTagUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(versionControlDtoList)
                 .retrieve()
