@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,15 +53,28 @@ public class SiteListServiceImpl implements SiteListService {
                     model.setSiteName(siteDetails.getSiteId());
                     model.setCity(siteDetails.getAddresses().getCity());
 
-                    List<VersionProductDto> versionProductDtoList = currentProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId())
-                            .stream()
-                            .map(versionModel -> {
-                                VersionProductDto dto = new VersionProductDto();
-                                dto.setProductName(versionModel.getProductName());
-                                dto.setProductVersion(versionModel.getProductVersion());
-                                return dto;
-                            })
-                            .collect(Collectors.toList());
+                    List<VersionProductDto> versionProductDtoList;
+                    List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
+                    if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
+                        versionProductDtoList = updateProductVersions.stream()
+                                .map(updateProductVersion -> {
+                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
+                                    versionControlMicroDto.setProductName(updateProductVersion.getProductName());
+                                    versionControlMicroDto.setProductVersion(updateProductVersion.getProductVersion());
+                                    return versionControlMicroDto;
+                                })
+                                .collect(Collectors.toList());
+                    } else {
+                        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
+                        versionProductDtoList = currentProductVersions.stream()
+                                .map(currentProductVersion -> {
+                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
+                                    versionControlMicroDto.setProductName(currentProductVersion.getProductName());
+                                    versionControlMicroDto.setProductVersion(currentProductVersion.getProductVersion());
+                                    return versionControlMicroDto;
+                                })
+                                .collect(Collectors.toList());
+                    }
 
                     model.setVersionControl(versionProductDtoList);
                     return model;
@@ -98,26 +112,32 @@ public class SiteListServiceImpl implements SiteListService {
     public VersionUpdateControlDto getListOfVersion(String deploymentId) {
         VersionUpdateControlDto versionUpdateControlDto = new VersionUpdateControlDto();
 
-        List<VersionControlMicroDto> versionControlMicroDtoList = updateProductVersionRepository.findByDeploymentId(deploymentId)
-                .map(updateProductVersions -> updateProductVersions.stream()
-                        .map(updateProductVersion -> {
-                            VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
-                            versionControlMicroDto.setRepo(updateProductVersion.getProductName());
-                            versionControlMicroDto.setTag(updateProductVersion.getProductVersion());
-                            return versionControlMicroDto;
-                        })
-                        .collect(Collectors.toList()))
-                .orElseGet(() -> currentProductVersionRepository.findByDeploymentId(deploymentId).stream()
-                        .map(currentProductVersion -> {
-                            VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
-                            versionControlMicroDto.setRepo(currentProductVersion.getProductName());
-                            versionControlMicroDto.setTag(currentProductVersion.getProductVersion());
-                            return versionControlMicroDto;
-                        })
-                        .collect(Collectors.toList()));
-
+        List<VersionControlMicroDto> versionControlMicroDtoList;
+        List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
+        if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
+            versionControlMicroDtoList = updateProductVersions.stream()
+                    .map(updateProductVersion -> {
+                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+                        versionControlMicroDto.setRepo(updateProductVersion.getProductName());
+                        versionControlMicroDto.setTag(updateProductVersion.getProductVersion());
+                        return versionControlMicroDto;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(deploymentId);
+            versionControlMicroDtoList = currentProductVersions.stream()
+                    .map(currentProductVersion -> {
+                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+                        versionControlMicroDto.setRepo(currentProductVersion.getProductName());
+                        versionControlMicroDto.setTag(currentProductVersion.getProductVersion());
+                        return versionControlMicroDto;
+                    })
+                    .collect(Collectors.toList());
+        }
         versionUpdateControlDto.setDeploymentId(deploymentId);
 
+        AtomicInteger flag = new AtomicInteger(0);
+        //Micro_service
         WebClient webClient = WebClient.create();
 
         List<VersionUpgradeDto> versionUpgradeDtoList = webClient.post()
@@ -129,14 +149,16 @@ public class SiteListServiceImpl implements SiteListService {
                 .block()
                 .stream()
                 .map(dockerVersionInformationDto -> {
+                    int currentFlag = flag.getAndIncrement();
                     VersionUpgradeDto versionUpgradeDto = new VersionUpgradeDto();
-                    versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
-//                    versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
+//                    versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
+                    versionUpgradeDto.setProduct_name(versionControlMicroDtoList.get(currentFlag).getRepo());
                     String currentVersion = updateProductVersionRepository.findByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct());
                     if (currentVersion == null) {
                         currentVersion = currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct());
                     }
-                    versionUpgradeDto.setProduct_current_version(currentVersion);
+//                    versionUpgradeDto.setProduct_current_version(currentVersion);
+                    versionUpgradeDto.setProduct_current_version(versionControlMicroDtoList.get(currentFlag).getTag());
                     List<VersionInformation> versionInformationListCopy = dockerVersionInformationDto.getVersions()
                             .stream()
                             .map(versionInformation -> {
