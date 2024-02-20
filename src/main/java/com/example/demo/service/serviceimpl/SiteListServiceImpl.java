@@ -213,6 +213,9 @@ public class SiteListServiceImpl implements SiteListService {
         siteDetailsRepository.deleteAddressesByDeploymentId(deploymentId);
         siteDetailsRepository.deletePersonsByDeploymentId(deploymentId);
         siteDetailsRepository.deleteSiteDetailsByDeploymentId(deploymentId);
+        currentProductVersionRepository.deleteByDeploymentId(deploymentId);
+        updateProductVersionRepository.deleteByDeploymentId(deploymentId);
+
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.example.demo.repository;
 
 import com.example.demo.Entity.CurrentProductVersion;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,4 +20,8 @@ public interface CurrentProductVersionRepository extends JpaRepository<CurrentPr
 
     @Query("SELECT COUNT(cpv) > 0 FROM CurrentProductVersion cpv WHERE cpv.deploymentId = :deploymentId")
     boolean existsByDeploymentId(@Param("deploymentId") String deploymentId);
+
+    @Transactional
+    @Modifying
+    void deleteByDeploymentId(String deploymentId);
 }

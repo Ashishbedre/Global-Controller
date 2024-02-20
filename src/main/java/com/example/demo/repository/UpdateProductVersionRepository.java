@@ -2,7 +2,9 @@ package com.example.demo.repository;
 
 import com.example.demo.Entity.CurrentProductVersion;
 import com.example.demo.Entity.UpdateProductVersion;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,5 +21,8 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
     @Query("SELECT upv FROM UpdateProductVersion upv WHERE upv.deploymentId = :deploymentId AND upv.productName = :productName")
     Optional<UpdateProductVersion> findByDeploymentIdAndProductNameForUpdateProductVersion(@Param("deploymentId") String deploymentId, @Param("productName") String productName);
 
+    @Transactional
+    @Modifying
+    void deleteByDeploymentId(String deploymentId);
 
 }
