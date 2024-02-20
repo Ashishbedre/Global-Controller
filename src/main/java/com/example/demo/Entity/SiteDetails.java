@@ -3,6 +3,7 @@ package com.example.demo.Entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -28,6 +29,8 @@ public class SiteDetails {
     private Boolean updateAvailable;
 
     private Boolean active;
+
+    private LocalDateTime lastSeen;
 
     public Long getId() {
         return id;
@@ -99,5 +102,13 @@ public class SiteDetails {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public LocalDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(LocalDateTime lastSeen) {
+        this.lastSeen = lastSeen;
     }
 }

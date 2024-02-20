@@ -5,6 +5,7 @@ import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
 import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
+import com.example.demo.enums.Task;
 import com.example.demo.repository.*;
 import com.example.demo.service.SiteListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -236,6 +237,7 @@ public class SiteListServiceImpl implements SiteListService {
                             existingEntity.setProductVersion(updateProductVersion.getProduct_set_version());
                             existingEntity.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
                             existingEntity.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
+                            existingEntity.setTask(Task.InQueue);
                             updateProductVersionRepository.save(existingEntity);
                         },() -> {
                             UpdateProductVersion model = new UpdateProductVersion();
@@ -244,6 +246,7 @@ public class SiteListServiceImpl implements SiteListService {
                             model.setProductName(updateProductVersion.getProduct_name());
                             model.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
                             model.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
+                            model.setTask(Task.InQueue);
                             updateProductVersionRepository.save(model);
                         }
                 );

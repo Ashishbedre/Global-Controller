@@ -6,6 +6,7 @@ import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
 import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
 //import com.example.demo.model.AgentModel;
+import com.example.demo.enums.Task;
 import com.example.demo.repository.CurrentProductVersionRepository;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
@@ -177,6 +178,7 @@ public class AddSiteServiceImpl implements AddSiteService {
                                 updateProductVersion.setDeploymentId(deploymentId);
                                 updateProductVersion.setProductName(productName);
                                 updateProductVersion.setProductVersion(productVersion);
+                                updateProductVersion.setTask(Task.InQueue);
                                 updateProductVersionRepository.save(updateProductVersion);
                                 siteDetails.setUpdateAvailable(true);
                             }

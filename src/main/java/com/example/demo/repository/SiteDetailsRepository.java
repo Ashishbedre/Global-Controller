@@ -31,6 +31,8 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     List<SiteDetails> findDistinctDeploymentIdByTenantIdAndProvisionIsTrue(String tenantId);
 
     SiteDetails findByDeploymentIdAndTenantId(String deploymentId, String tenantId);
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM SiteDetails s WHERE s.provision = true AND s.updateAvailable = true AND s.deploymentId = :deploymentId")
+    boolean existsByProvisionAndUpdateAvailableAndDeploymentId(String deploymentId);
 
 
 

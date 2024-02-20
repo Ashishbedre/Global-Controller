@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.dto.UpdateAgentDataSaveDto;
+import com.example.demo.dto.UpdateAvailableDataDto;
 import com.example.demo.service.UpdateAgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,19 @@ public class UpdateAgentController {
     UpdateAgentService updateAgentService;
 
     @PostMapping("/saveDataToSiteDetailsAndCurrentProductVersion")
-    public ResponseEntity<?> belowVersion(@RequestBody UpdateAgentDataSaveDto updateAgentDataSaveDto){
+    public ResponseEntity<Boolean> saveDataToSiteDetailsAndCurrentProductVersion(@RequestBody UpdateAgentDataSaveDto updateAgentDataSaveDto){
          updateAgentService.saveDataToSiteDetailsAndCurrentProductVersion(updateAgentDataSaveDto);
-        return new ResponseEntity<>( HttpStatus.OK);
+        return new ResponseEntity<>(true,HttpStatus.OK);
+    }
 
+    @GetMapping("/saveDataToSiteDetailsAndCurrentProductVersion/deployment_id={deployment_id}/tenant_name={tenant_name}")
+    public ResponseEntity<UpdateAvailableDataDto> getTheUpdateAvailable(@PathVariable("deployment_id") String deploymentId,@PathVariable("tenant_name") String tenantName){
+        return new ResponseEntity<>(updateAgentService.getTheUpdateAvailable(deploymentId,tenantName),HttpStatus.OK);
+    }
+
+    @PostMapping("/saveDataToUpdateVersion")
+    public ResponseEntity<Boolean> saveDataToUpdateVersion(@RequestBody UpdateAvailableDataDto updateAvailableDataDto){
+        return new ResponseEntity<>(updateAgentService.saveDataToUpdateVersion(updateAvailableDataDto),HttpStatus.OK);
     }
 
 

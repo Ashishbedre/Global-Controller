@@ -1,17 +1,10 @@
-package com.example.demo.Entity;
+package com.example.demo.dto;
 
 import com.example.demo.enums.Task;
-import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-@Entity
-public class UpdateProductVersion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String deploymentId;
+public class ProductDetailsDto {
 
     private String productName;
 
@@ -21,24 +14,7 @@ public class UpdateProductVersion {
 
     private LocalDateTime product_scheduled_update_dateTime;
 
-    @Enumerated(EnumType.STRING)
     private Task task;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDeploymentId() {
-        return deploymentId;
-    }
-
-    public void setDeploymentId(String deploymentId) {
-        this.deploymentId = deploymentId;
-    }
 
     public String getProductName() {
         return productName;
@@ -55,6 +31,7 @@ public class UpdateProductVersion {
     public void setProductVersion(String productVersion) {
         this.productVersion = productVersion;
     }
+
     public Boolean getProduct_scheduled_update() {
         return product_scheduled_update;
     }
