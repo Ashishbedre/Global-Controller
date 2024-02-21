@@ -143,9 +143,8 @@ public class SiteListServiceImpl implements SiteListService {
 
     public List<ProductAvailableVersionDto> upgradeAndDowngrade(List<VersionControlMicroDto> versionControlMicroDtoList ,String deploymentId){
         List<ProductAvailableVersionDto> productAvailableVersionDtosList = new ArrayList<>();
-        ProductAvailableVersionDto productAvailableVersionDto = new ProductAvailableVersionDto();
         for(VersionControlMicroDto versionControlMicroDto: versionControlMicroDtoList){
-
+            ProductAvailableVersionDto productAvailableVersionDto = new ProductAvailableVersionDto();
             List<VersionControlMicroDto> listAdd = new ArrayList<>();
             VersionControlMicroDto object = new VersionControlMicroDto();
             object.setRepo(versionControlMicroDto.getRepo());
@@ -155,10 +154,25 @@ public class SiteListServiceImpl implements SiteListService {
             productAvailableVersionDto.setProduct_current_version(versionControlMicroDto.getTag());
             WebClient webClient = WebClient.create();
 
-            List<VersionInformation> versionInformations = webClient.post()
+            List<VersionInformation> versionInformationsUpgradeVersion = webClient.post()
                     .uri(getUpgradeVersion)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(versionControlMicroDtoList)
+                    .bodyValue(listAdd)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
+                    .block()
+                    .stream()
+                    .flatMap(dockerVersionInformationDto -> dockerVersionInformationDto.getVersions().stream())
+                    .map(versionInformation -> {
+                        VersionInformation versionInformationCopy = new VersionInformation();
+                        versionInformationCopy.setVersion(versionInformation.getVersion());
+                        return versionInformationCopy;
+                    })
+                    .collect(Collectors.toList());
+            List<VersionInformation> versionInformationsDowngradeVersion = webClient.post()
+                    .uri(getDowngradeVersion)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(listAdd)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
                     .block()
@@ -171,51 +185,13 @@ public class SiteListServiceImpl implements SiteListService {
                     })
                     .collect(Collectors.toList());
 
-            productAvailableVersionDto.setProduct_downgrade_available_version(versionInformations);
+            productAvailableVersionDto.setProduct_upgrade_available_version(versionInformationsUpgradeVersion);
+            productAvailableVersionDto.setProduct_downgrade_available_version(versionInformationsDowngradeVersion);
+            productAvailableVersionDtosList.add(productAvailableVersionDto);
         }
-
+        return productAvailableVersionDtosList;
     }
 
-
-//    public List<ProductAvailableVersionDto> upgradeAndDowngrade(List<VersionControlMicroDto> versionControlMicroDtoList ,String deploymentId) {
-//        AtomicInteger flag = new AtomicInteger(0);
-//        //Micro_service
-//        WebClient webClient = WebClient.create();
-//
-//        List<ProductAvailableVersionDto> versionUpgradeDtoList = webClient.post()
-//                .uri(url)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(versionControlMicroDtoList)
-//                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
-//                .block()
-//                .stream()
-//                .map(dockerVersionInformationDto -> {
-//                    int currentFlag = flag.getAndIncrement();
-//                    ProductAvailableVersionDto versionUpgradeDto = new ProductAvailableVersionDto();
-////                    versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
-//                    versionUpgradeDto.setProduct_name(versionControlMicroDtoList.get(currentFlag).getRepo());
-//                    String currentVersion = updateProductVersionRepository.findByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct());
-//                    if (currentVersion == null) {
-//                        currentVersion = currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct());
-//                    }
-////                    versionUpgradeDto.setProduct_current_version(currentVersion);
-//                    versionUpgradeDto.setProduct_current_version(versionControlMicroDtoList.get(currentFlag).getTag());
-//                    List<VersionInformation> versionInformationListCopy = dockerVersionInformationDto.getVersions()
-//                            .stream()
-//                            .map(versionInformation -> {
-//                                VersionInformation versionInformationCopy = new VersionInformation();
-//                                versionInformationCopy.setVersion(versionInformation.getVersion());
-//                                return versionInformationCopy;
-//                            })
-//                            .collect(Collectors.toList());
-//                    versionUpgradeDto.setProductUpgradeAvailableVersion(versionInformationListCopy);
-//                    return versionUpgradeDto;
-//                })
-//                .collect(Collectors.toList());
-//        return  versionUpgradeDtoList;
-//
-//    }
 
     @Override
     public void UpdateExisitingSite(ProvisionDtoUpdate provisionDto, String deploymentId) {

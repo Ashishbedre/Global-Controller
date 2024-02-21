@@ -39,7 +39,7 @@ public class AddSiteServiceImpl implements AddSiteService {
 
     @Override
     public List<TenantDto> getListOfTenant() {
-        List<TenantDto> temp = siteDetailsRepository.findAllDistinctTenantIds()
+        List<TenantDto> tenantDtos = siteDetailsRepository.findAllDistinctTenantIds()
                 .stream()
                 .map(string -> {
                     TenantDto dto = new TenantDto();
@@ -48,7 +48,7 @@ public class AddSiteServiceImpl implements AddSiteService {
                 })
                 .collect(Collectors.toList());
 
-        return temp;
+        return tenantDtos;
     }
 
     @Override
