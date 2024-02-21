@@ -1,5 +1,6 @@
 package com.example.demo.service.serviceimpl;
 
+import ch.qos.logback.core.util.FixedDelay;
 import com.example.demo.Entity.CurrentProductVersion;
 import com.example.demo.Entity.SiteDetails;
 import com.example.demo.Entity.UpdateProductVersion;
@@ -12,11 +13,14 @@ import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.UpdateAgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@EnableScheduling
 @Service
 public class UpdateAgentServiceImpl implements UpdateAgentService {
 
@@ -95,11 +99,13 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
 
             updateProductVersions.add(updateProductVersion);
         }
+        updateProductVersionRepository.saveAll(updateProductVersions);
 
         return true;
     }
 
 
+//    @Scheduled(fixedDelay = 10000)
 //    public void updateProductVersionAndDeleteUpdateProductVersion(String productName, String deploymentId) {
 //        List<UpdateProductVersion> completedUpdates = updateProductVersionRepository.findByTaskAndProductNameAndDeploymentId(Task.Complete, productName, deploymentId);
 //        for (UpdateProductVersion update : completedUpdates) {

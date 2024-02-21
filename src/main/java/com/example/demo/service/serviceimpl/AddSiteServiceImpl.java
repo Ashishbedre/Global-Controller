@@ -34,8 +34,8 @@ public class AddSiteServiceImpl implements AddSiteService {
     @Autowired
     UpdateProductVersionRepository updateProductVersionRepository;
 
-    @Value("${microService.api.url}")
-    private String microServiceTagUrl;
+    @Value("${getUpgradeVersion.api.url}")
+    private String getUpgradeVersion;
 
     @Override
     public List<TenantDto> getListOfTenant() {
@@ -96,7 +96,7 @@ public class AddSiteServiceImpl implements AddSiteService {
         WebClient webClient = WebClient.create();
 
         List<DockerVersionInformationDto> dockerVersionInformationDtoList = webClient.post()
-                .uri(microServiceTagUrl)
+                .uri(getUpgradeVersion)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(versionControlDtoList)
                 .retrieve()

@@ -30,7 +30,7 @@ public class SiteListController {
 
     // To get the list of all site version in the provision list of site list
     @GetMapping("/provision/site_list/get_version_control_provisioned_site/deployment_id={deployment_id}")
-    public VersionUpdateControlDto getVersionData(@PathVariable("deployment_id") String deploymentId) {
+    public UpgradeAndDowngradeDto getVersionData(@PathVariable("deployment_id") String deploymentId) {
         return siteListService.getListOfVersion(deploymentId);
     }
 
