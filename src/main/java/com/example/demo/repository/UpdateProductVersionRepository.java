@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import com.example.demo.Entity.CurrentProductVersion;
 import com.example.demo.Entity.UpdateProductVersion;
+import com.example.demo.enums.Task;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,17 +26,16 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
     @Modifying
     void deleteByDeploymentId(String deploymentId);
 
-//    List<UpdateProductVersion> findByTaskAndProductNameAndDeploymentId(Task task, String productName, String deploymentId);
-//
-//    @Transactional
-//    @Modifying
-//    @Query("UPDATE CurrentProductVersion cpv SET cpv.productVersion = :productVersion WHERE cpv.productName = :productName AND cpv.deploymentId = :deploymentId")
-//    void updateProductVersion(String productName, String deploymentId, String productVersion);
-//
-//    @Transactional
-//    @Modifying
-//    @Query("DELETE FROM UpdateProductVersion upv WHERE upv.task = :task AND upv.productName = :productName AND upv.deploymentId = :deploymentId")
-//    void deleteCompletedUpdates(Task task, String productName, String deploymentId);
-//
+    List<UpdateProductVersion> findByTask(Task task);
+    @Transactional
+    @Modifying
+    @Query("UPDATE CurrentProductVersion cpv SET cpv.productVersion = :productVersion WHERE cpv.productName = :productName AND cpv.deploymentId = :deploymentId")
+    void updateProductVersion(String productName, String deploymentId, String productVersion);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM UpdateProductVersion upv WHERE upv.task = :task AND upv.productName = :productName AND upv.deploymentId = :deploymentId")
+    void deleteCompletedUpdates(Task task, String productName, String deploymentId);
+
 
 }

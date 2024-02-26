@@ -8,6 +8,7 @@ import com.example.demo.dto.ProductDetailsDto;
 import com.example.demo.dto.ProductDto;
 import com.example.demo.dto.UpdateAgentDataSaveDto;
 import com.example.demo.dto.UpdateAvailableDataDto;
+import com.example.demo.enums.Task;
 import com.example.demo.repository.CurrentProductVersionRepository;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @EnableScheduling
 @Service
@@ -77,6 +79,8 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
                 productDetailsDto.setProduct_scheduled_update_dateTime(send.getProduct_scheduled_update_dateTime());
                 productDetailsDto.setTask(send.getTask());
                 dto.add(productDetailsDto);
+                send.setTask(Task.InQueue);
+                updateProductVersionRepository.save(send);
             }
             updateAgentDataSaveDto.setProductDetails(dto);
         }
@@ -89,7 +93,9 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         List<UpdateProductVersion> updateProductVersions = new ArrayList<>();
 
         for (ProductDetailsDto productDetailsDto : updateAvailableDataDto.getProductDetails()) {
-            UpdateProductVersion updateProductVersion = new UpdateProductVersion();
+            Optional<UpdateProductVersion> optionalUpdateProductVersion = updateProductVersionRepository.findByDeploymentIdAndProductNameAndProductVersion(
+                    updateAvailableDataDto.getDeploymentId(),productDetailsDto.getProductName(),productDetailsDto.getProductVersion());
+            UpdateProductVersion updateProductVersion = optionalUpdateProductVersion.get();
             updateProductVersion.setDeploymentId(updateAvailableDataDto.getDeploymentId());
             updateProductVersion.setProductName(productDetailsDto.getProductName());
             updateProductVersion.setProductVersion(productDetailsDto.getProductVersion());
@@ -105,15 +111,15 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
     }
 
 
-//    @Scheduled(fixedDelay = 10000)
-//    public void updateProductVersionAndDeleteUpdateProductVersion(String productName, String deploymentId) {
-//        List<UpdateProductVersion> completedUpdates = updateProductVersionRepository.findByTaskAndProductNameAndDeploymentId(Task.Complete, productName, deploymentId);
-//        for (UpdateProductVersion update : completedUpdates) {
-//            // Update product version in CurrentProductVersion entity
-//            updateProductVersionRepository.updateProductVersion(productName, deploymentId, update.getProductVersion());
-//
-//            // Delete UpdateProductVersion entity
-//            updateProductVersionRepository.deleteCompletedUpdates(Task.Complete, productName, deploymentId);
-//        }
-//    }
+    @Scheduled(fixedDelay = 10000)
+    void updateProductVersionAndDeleteUpdateProductVersion() {
+        List<UpdateProductVersion> completedUpdates = updateProductVersionRepository.findByTask(Task.Completed);
+        for (UpdateProductVersion update : completedUpdates) {
+            // Update product version in CurrentProductVersion entity
+            updateProductVersionRepository.updateProductVersion(update.getProductName(), update.getDeploymentId(), update.getProductVersion());
+
+            // Delete UpdateProductVersion entity
+            updateProductVersionRepository.deleteCompletedUpdates(Task.Completed, update.getProductName(), update.getDeploymentId());
+        }
+    }
 }

@@ -178,7 +178,7 @@ public class AddSiteServiceImpl implements AddSiteService {
                                 updateProductVersion.setDeploymentId(deploymentId);
                                 updateProductVersion.setProductName(productName);
                                 updateProductVersion.setProductVersion(productVersion);
-                                updateProductVersion.setTask(Task.InQueue);
+                                updateProductVersion.setTask(Task.Scheduled);
                                 updateProductVersionRepository.save(updateProductVersion);
                                 siteDetails.setUpdateAvailable(true);
                             }
