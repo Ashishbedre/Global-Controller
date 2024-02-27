@@ -23,8 +23,8 @@ public class DashBoard {
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<Notifications> notifications(){
-        return  new ResponseEntity<>(null,HttpStatus.OK);
+    public ResponseEntity<List<Notifications>> notifications(){
+        return  new ResponseEntity<>(dashBoardService.getAllNotifications(),HttpStatus.OK);
     }
 
     @PostMapping("/updateNotifications")

@@ -1,16 +1,23 @@
 package com.example.demo.service.serviceimpl;
 
+import com.example.demo.Entity.Notifications;
 import com.example.demo.dto.DashBoardCountDto;
+import com.example.demo.repository.NotificationsRepository;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.service.DashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DashBoardServiceImp implements DashBoardService {
 
     @Autowired
     SiteDetailsRepository siteDetailsRepository;
+
+    @Autowired
+    NotificationsRepository notificationsRepository;
     @Override
     public DashBoardCountDto countTheElementOfSiteLists() {
         DashBoardCountDto dashBoardCountDto = new DashBoardCountDto();
@@ -24,5 +31,10 @@ public class DashBoardServiceImp implements DashBoardService {
         }
 
         return dashBoardCountDto;
+    }
+
+    @Override
+    public List<Notifications> getAllNotifications() {
+        return notificationsRepository.findAll();
     }
 }
