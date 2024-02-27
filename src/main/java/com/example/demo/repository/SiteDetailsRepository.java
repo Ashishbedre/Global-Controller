@@ -50,4 +50,18 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     @Modifying
     @Query("DELETE FROM SiteDetails s WHERE s.deploymentId = :deploymentId")
     void deleteSiteDetailsByDeploymentId(@Param("deploymentId") String deploymentId);
+
+    //Dashboard
+    @Query("SELECT COUNT(DISTINCT s.tenantId) FROM SiteDetails s WHERE s.tenantId IS NOT NULL")
+    Long countDistinctTenantIds();
+
+    @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.active = true")
+    Long countActiveSites();
+
+    @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = true")
+    Long countProvisionedSites();
+
+    @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = false")
+    Long countUnprovisionedSites();
+
 }

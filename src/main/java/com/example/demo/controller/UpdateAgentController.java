@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1")
 @CrossOrigin
-public class UpdateAgentController {
+public class    UpdateAgentController {
     @Autowired
     UpdateAgentService updateAgentService;
 
