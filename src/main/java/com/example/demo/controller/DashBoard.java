@@ -27,9 +27,9 @@ public class DashBoard {
         return  new ResponseEntity<>(dashBoardService.getAllNotifications(),HttpStatus.OK);
     }
 
-    @PostMapping("/updateNotifications")
+    @PutMapping("/updateNotifications")
     public ResponseEntity<Boolean> updateNotifications(@RequestBody List<Notifications> updateNotifications){
-        return  new ResponseEntity<>(true,HttpStatus.OK);
+        return  new ResponseEntity<>(dashBoardService.updateNotifications(updateNotifications),HttpStatus.OK);
     }
 
 }

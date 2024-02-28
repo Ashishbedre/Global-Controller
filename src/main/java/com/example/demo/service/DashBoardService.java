@@ -10,5 +10,9 @@ public interface DashBoardService {
     DashBoardCountDto countTheElementOfSiteLists();
     List<Notifications> getAllNotifications();
 
+    boolean updateNotifications(List<Notifications> notificationsList);
+
+
+
 
 }
