@@ -113,33 +113,75 @@ public class SiteListServiceImpl implements SiteListService {
     @Override
     public UpgradeAndDowngradeDto getListOfVersion(String deploymentId) {
         UpgradeAndDowngradeDto upgradeAndDowngradeDto = new UpgradeAndDowngradeDto();
-
-        List<VersionControlMicroDto> versionControlMicroDtoList;
-        List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
-        if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
-            versionControlMicroDtoList = updateProductVersions.stream()
-                    .map(updateProductVersion -> {
-                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
-                        versionControlMicroDto.setRepo(updateProductVersion.getProductName());
-                        versionControlMicroDto.setTag(updateProductVersion.getProductVersion());
-                        return versionControlMicroDto;
-                    })
-                    .collect(Collectors.toList());
-        } else {
-            List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(deploymentId);
-            versionControlMicroDtoList = currentProductVersions.stream()
-                    .map(currentProductVersion -> {
-                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
-                        versionControlMicroDto.setRepo(currentProductVersion.getProductName());
-                        versionControlMicroDto.setTag(currentProductVersion.getProductVersion());
-                        return versionControlMicroDto;
-                    })
-                    .collect(Collectors.toList());
-        }
+        List<VersionControlMicroDto> versionControlMicroDtoList = converttoVersionControlMicroDto(deploymentId);
         upgradeAndDowngradeDto.setDeploymentId(deploymentId);
         upgradeAndDowngradeDto.setProduct_list(upgradeAndDowngrade(versionControlMicroDtoList,deploymentId));
         return upgradeAndDowngradeDto;
     }
+//        List<VersionControlMicroDto> versionControlMicroDtoList;
+//
+//        List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
+//        if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
+//            versionControlMicroDtoList = updateProductVersions.stream()
+//                    .map(updateProductVersion -> {
+//                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+//                        versionControlMicroDto.setRepo(updateProductVersion.getProductName());
+//                        versionControlMicroDto.setTag(updateProductVersion.getProductVersion());
+//                        return versionControlMicroDto;
+//                    })
+//                    .collect(Collectors.toList());
+//        } else {
+//            List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(deploymentId);
+//            versionControlMicroDtoList = currentProductVersions.stream()
+//                    .map(currentProductVersion -> {
+//                        VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+//                        versionControlMicroDto.setRepo(currentProductVersion.getProductName());
+//                        versionControlMicroDto.setTag(currentProductVersion.getProductVersion());
+//                        return versionControlMicroDto;
+//                    })
+//                    .collect(Collectors.toList());
+//        }
+
+    public List<VersionControlMicroDto> converttoVersionControlMicroDto(String deploymentId) {
+        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository
+                .findByDeploymentId(deploymentId);
+
+        return currentProductVersions.stream().map(currentProductVersion -> {
+            UpdateProductVersion updateProductVersion = updateProductVersionRepository
+                    .findByDeploymentIdAndProductName(deploymentId, currentProductVersion.getProductName())
+                    .orElse(null);
+
+            VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+            versionControlMicroDto.setRepo(currentProductVersion.getProductName());
+            versionControlMicroDto.setTag(updateProductVersion != null ? updateProductVersion.getProductVersion()
+                    : currentProductVersion.getProductVersion());
+
+            return versionControlMicroDto;
+        }).collect(Collectors.toList());
+    }
+//for optimize the code, I have comment
+//    public List<VersionControlMicroDto> converttoVersionControlMicroDto(String deploymentId){
+//        List<VersionControlMicroDto> versionControlMicroDtoList = new ArrayList<>();
+//        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(deploymentId);
+//        for(CurrentProductVersion iterateCurrentProductVersion : currentProductVersions){
+//            Optional<UpdateProductVersion> updateProductVersionsList = updateProductVersionRepository.
+//                    findByDeploymentIdAndProductName(deploymentId,iterateCurrentProductVersion.getProductName());
+//            if(updateProductVersionsList.isPresent()){
+//                VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+//                UpdateProductVersion updateProductVersion = updateProductVersionsList.get();
+//                versionControlMicroDto.setRepo(updateProductVersion.getProductName());
+//                versionControlMicroDto.setTag(updateProductVersion.getProductVersion());
+//                versionControlMicroDtoList.add(versionControlMicroDto);
+//            }else{
+//                VersionControlMicroDto versionControlMicroDto = new VersionControlMicroDto();
+//                versionControlMicroDto.setRepo(iterateCurrentProductVersion.getProductName());
+//                versionControlMicroDto.setTag(iterateCurrentProductVersion.getProductVersion());
+//                versionControlMicroDtoList.add(versionControlMicroDto);
+//            }
+//
+//        }
+//        return versionControlMicroDtoList;
+//    }
 
     public List<ProductAvailableVersionDto> upgradeAndDowngrade(List<VersionControlMicroDto> versionControlMicroDtoList ,String deploymentId){
         List<ProductAvailableVersionDto> productAvailableVersionDtosList = new ArrayList<>();

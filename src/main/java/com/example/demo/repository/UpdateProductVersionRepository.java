@@ -16,8 +16,8 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
     Optional<UpdateProductVersion> findByDeploymentIdAndProductNameAndProductVersion(String deploymentId, String productName, String productVersion);
     List<UpdateProductVersion> findByDeploymentId(String deploymentId);
 
-    @Query("SELECT s.productVersion FROM UpdateProductVersion s WHERE s.deploymentId = ?1 AND s.productName = ?2")
-    String findByDeploymentIdAndProductName(String deploymentId, String productName);
+//    @Query("SELECT s.productVersion FROM UpdateProductVersion s WHERE s.deploymentId = ?1 AND s.productName = ?2")
+//    String findByDeploymentIdAndProductName(String deploymentId, String productName);
 
     @Query("SELECT upv FROM UpdateProductVersion upv WHERE upv.deploymentId = :deploymentId AND upv.productName = :productName")
     Optional<UpdateProductVersion> findByDeploymentIdAndProductNameForUpdateProductVersion(@Param("deploymentId") String deploymentId, @Param("productName") String productName);
@@ -36,6 +36,8 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
     @Modifying
     @Query("DELETE FROM UpdateProductVersion upv WHERE upv.task = :task AND upv.productName = :productName AND upv.deploymentId = :deploymentId")
     void deleteCompletedUpdates(Task task, String productName, String deploymentId);
+
+    Optional<UpdateProductVersion> findByDeploymentIdAndProductName(String deploymentId, String productName);
 
 
 }
