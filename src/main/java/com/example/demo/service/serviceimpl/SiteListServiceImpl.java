@@ -54,34 +54,51 @@ public class SiteListServiceImpl implements SiteListService {
                     model.setDeploymentId(siteDetails.getDeploymentId());
                     model.setSiteName(siteDetails.getSiteId());
                     model.setCity(siteDetails.getAddresses().getCity());
-
-                    List<VersionProductDto> versionProductDtoList;
-                    List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
-                    if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
-                        versionProductDtoList = updateProductVersions.stream()
-                                .map(updateProductVersion -> {
-                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
-                                    versionControlMicroDto.setProductName(updateProductVersion.getProductName());
-                                    versionControlMicroDto.setProductVersion(updateProductVersion.getProductVersion());
-                                    return versionControlMicroDto;
-                                })
-                                .collect(Collectors.toList());
-                    } else {
-                        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
-                        versionProductDtoList = currentProductVersions.stream()
-                                .map(currentProductVersion -> {
-                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
-                                    versionControlMicroDto.setProductName(currentProductVersion.getProductName());
-                                    versionControlMicroDto.setProductVersion(currentProductVersion.getProductVersion());
-                                    return versionControlMicroDto;
-                                })
-                                .collect(Collectors.toList());
-                    }
-
-                    model.setVersionControl(versionProductDtoList);
+                    model.setVersionControl(converttoVersionVersionProductDto(siteDetails.getDeploymentId()));
                     return model;
                 })
                 .collect(Collectors.toList());
+    }
+//                    List<VersionProductDto> versionProductDtoList;
+//                    List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
+//                    if (updateProductVersions != null && !updateProductVersions.isEmpty()) {
+//                        versionProductDtoList = updateProductVersions.stream()
+//                                .map(updateProductVersion -> {
+//                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
+//                                    versionControlMicroDto.setProductName(updateProductVersion.getProductName());
+//                                    versionControlMicroDto.setProductVersion(updateProductVersion.getProductVersion());
+//                                    return versionControlMicroDto;
+//                                })
+//                                .collect(Collectors.toList());
+//                    } else {
+//                        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
+//                        versionProductDtoList = currentProductVersions.stream()
+//                                .map(currentProductVersion -> {
+//                                    VersionProductDto versionControlMicroDto = new VersionProductDto();
+//                                    versionControlMicroDto.setProductName(currentProductVersion.getProductName());
+//                                    versionControlMicroDto.setProductVersion(currentProductVersion.getProductVersion());
+//                                    return versionControlMicroDto;
+//                                })
+//                                .collect(Collectors.toList());
+//                    }
+
+
+    public List<VersionProductDto> converttoVersionVersionProductDto(String deploymentId) {
+        List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository
+                .findByDeploymentId(deploymentId);
+
+        return currentProductVersions.stream().map(currentProductVersion -> {
+            UpdateProductVersion updateProductVersion = updateProductVersionRepository
+                    .findByDeploymentIdAndProductName(deploymentId, currentProductVersion.getProductName())
+                    .orElse(null);
+
+            VersionProductDto versionControlMicroDto = new VersionProductDto();
+            versionControlMicroDto.setProductName(currentProductVersion.getProductName());
+            versionControlMicroDto.setProductVersion(updateProductVersion != null ? updateProductVersion.getProductVersion()
+                    : currentProductVersion.getProductVersion());
+
+            return versionControlMicroDto;
+        }).collect(Collectors.toList());
     }
 
 
