@@ -180,7 +180,7 @@ public class AddSiteServiceImpl implements AddSiteService {
                                 updateProductVersion.setProductVersion(productVersion);
                                 //update Agent
                                 updateProductVersion.setProduct_scheduled_update(false);
-//                                updateProductVersion.setTask(Task.Scheduled);
+                                updateProductVersion.setTask(Task.InQueue);
                                 updateProductVersionRepository.save(updateProductVersion);
                                 siteDetails.setUpdateAvailable(true);
                             }
