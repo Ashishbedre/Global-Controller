@@ -61,7 +61,7 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = true")
     Long countProvisionedSites();
 
-    @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = false")
+    @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = false OR s.provision IS NULL")
     Long countUnprovisionedSites();
 
 }
