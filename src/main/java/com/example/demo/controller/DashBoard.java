@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.Entity.UpdateProductVersion;
 import com.example.demo.dto.DashBoardCountDto;
+import com.example.demo.dto.UpdateAndDowngradeMonitorDto;
 import com.example.demo.service.DashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class DashBoard {
 
 //    get the list of update table data
     @GetMapping("/getUpdateProductVerion")
-    public  ResponseEntity<List<UpdateProductVersion>> getUpdateProductVerion(){
+    public  ResponseEntity<List<UpdateAndDowngradeMonitorDto>> getUpdateProductVerion(){
         return new ResponseEntity<>(dashBoardService.ListOfUpdateProductVersion(),HttpStatus.OK);
     }
 

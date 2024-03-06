@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import com.example.demo.enums.Task;
+
 import java.util.List;
 
 public class SiteListDto {
@@ -7,6 +9,9 @@ public class SiteListDto {
 	private String deploymentId;
 	private String siteName;
 	private String city;
+
+	private Boolean active;
+	private Task task;
 	private List<VersionProductDto> versionControl;
 	
 	
@@ -28,6 +33,23 @@ public class SiteListDto {
 	public void setCity(String city) {
 		this.city = city;
 	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	public Task getTask() {
+		return task;
+	}
+
+	public void setTask(Task task) {
+		this.task = task;
+	}
+
 	public List<VersionProductDto> getVersionControl() {
 		return versionControl;
 	}

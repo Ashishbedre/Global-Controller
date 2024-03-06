@@ -39,5 +39,18 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
 
     Optional<UpdateProductVersion> findByDeploymentIdAndProductName(String deploymentId, String productName);
 
+    @Query("SELECT DISTINCT u.deploymentId FROM UpdateProductVersion u")
+    List<String> findDistinctDeploymentId();
+
+
+    @Query("SELECT u FROM UpdateProductVersion u WHERE u.deploymentId = :deploymentId " +
+            "ORDER BY CASE u.task " +
+            "WHEN 'InProgress' THEN 1 " +
+            "WHEN 'InQueue' THEN 2 " +
+            "WHEN 'Scheduled' THEN 3 " +
+            "WHEN 'Complete' THEN 4 " +
+            "ELSE 5 " +
+            "END, u.product_scheduled_update_dateTime ASC")
+    List<UpdateProductVersion> findSingleByDeploymentIdOrderByTaskPriority(String deploymentId);
 
 }

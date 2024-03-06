@@ -52,9 +52,17 @@ public class SiteListServiceImpl implements SiteListService {
                 .map(siteDetails -> {
                     SiteListDto model = new SiteListDto();
                     model.setDeploymentId(siteDetails.getDeploymentId());
+                    model.setActive(siteDetails.getActive());
+                    List<UpdateProductVersion> updateProductVersion = updateProductVersionRepository
+                            .findSingleByDeploymentIdOrderByTaskPriority(siteDetails.getDeploymentId());
+                    if(updateProductVersion.size()!=0){
+                        model.setTask(updateProductVersion.get(0).getTask());
+                    }else{
+                        model.setTask(null);
+                    }
                     model.setSiteName(siteDetails.getSiteId());
                     model.setCity(siteDetails.getAddresses().getCity());
-                    model.setVersionControl(converttoVersionVersionProductDto(siteDetails.getDeploymentId()));
+                    model.setVersionControl(converttoVersionProductDto(siteDetails.getDeploymentId()));
                     return model;
                 })
                 .collect(Collectors.toList());
@@ -83,7 +91,7 @@ public class SiteListServiceImpl implements SiteListService {
 //                    }
 
 
-    public List<VersionProductDto> converttoVersionVersionProductDto(String deploymentId) {
+    public List<VersionProductDto> converttoVersionProductDto(String deploymentId) {
         List<CurrentProductVersion> currentProductVersions = currentProductVersionRepository
                 .findByDeploymentId(deploymentId);
 

@@ -1,13 +1,16 @@
 package com.example.demo.service.serviceimpl;
 
+import com.example.demo.Entity.SiteDetails;
 import com.example.demo.Entity.UpdateProductVersion;
 import com.example.demo.dto.DashBoardCountDto;
+import com.example.demo.dto.UpdateAndDowngradeMonitorDto;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.DashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,8 +38,20 @@ public class DashBoardServiceImp implements DashBoardService {
     }
 
     @Override
-    public List<UpdateProductVersion> ListOfUpdateProductVersion() {
-        return updateProductVersionRepository.findAll();
+    public List<UpdateAndDowngradeMonitorDto> ListOfUpdateProductVersion() {
+        List<String> deploymentIds = updateProductVersionRepository.findDistinctDeploymentId();
+        List<UpdateAndDowngradeMonitorDto> updateAndDowngradeMonitorDtos = new ArrayList<>();
+        for(String deploymentId : deploymentIds){
+            UpdateAndDowngradeMonitorDto updateAndDowngradeMonitorDto = new UpdateAndDowngradeMonitorDto();
+            List<UpdateProductVersion> updateProductVersion = updateProductVersionRepository
+                    .findSingleByDeploymentIdOrderByTaskPriority(deploymentId);
+            SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
+            updateAndDowngradeMonitorDto.setSiteId(siteDetails.getSiteId());
+            updateAndDowngradeMonitorDto.setTenantId(siteDetails.getTenantId());
+            updateAndDowngradeMonitorDto.setTask(updateProductVersion.get(0).getTask());
+            updateAndDowngradeMonitorDtos.add(updateAndDowngradeMonitorDto);
+        }
+        return updateAndDowngradeMonitorDtos;
     }
 
 
