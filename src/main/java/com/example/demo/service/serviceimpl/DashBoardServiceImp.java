@@ -4,6 +4,7 @@ import com.example.demo.Entity.SiteDetails;
 import com.example.demo.Entity.UpdateProductVersion;
 import com.example.demo.dto.DashBoardCountDto;
 import com.example.demo.dto.UpdateAndDowngradeMonitorDto;
+import com.example.demo.enums.Task;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.DashBoardService;
@@ -48,10 +49,25 @@ public class DashBoardServiceImp implements DashBoardService {
             SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
             updateAndDowngradeMonitorDto.setSiteId(siteDetails.getSiteId());
             updateAndDowngradeMonitorDto.setTenantId(siteDetails.getTenantId());
-            updateAndDowngradeMonitorDto.setTask(updateProductVersion.get(0).getTask());
+            updateAndDowngradeMonitorDto.setTask(convertTaskInFrontendView(updateProductVersion.get(0).getTask()));
             updateAndDowngradeMonitorDtos.add(updateAndDowngradeMonitorDto);
         }
         return updateAndDowngradeMonitorDtos;
+    }
+
+    public String convertTaskInFrontendView(Task task) {
+        switch (task) {
+            case Scheduled:
+                return "Scheduled for update";
+            case InProgress:
+                return "Update in progress";
+            case InQueue:
+                return "In queue";
+            case Completed:
+                return "Completed";
+            default:
+                return "";
+        }
     }
 
 

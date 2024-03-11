@@ -8,7 +8,7 @@ public class UpdateAndDowngradeMonitorDto {
 
     private String siteId;
 
-    private Task task;
+    private String task;
 
     public String getTenantId() {
         return tenantId;
@@ -26,11 +26,11 @@ public class UpdateAndDowngradeMonitorDto {
         this.siteId = siteId;
     }
 
-    public Task getTask() {
+    public String getTask() {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(String task) {
         this.task = task;
     }
 }
