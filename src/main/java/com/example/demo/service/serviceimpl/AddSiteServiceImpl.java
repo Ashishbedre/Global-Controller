@@ -144,6 +144,8 @@ public class AddSiteServiceImpl implements AddSiteService {
                         address.setState(provisionDto.getAddress().getState());
                         address.setCity(provisionDto.getAddress().getCity());
                         address.setPinCode(provisionDto.getAddress().getPinCode());
+                        //add country
+                        address.setCountry(provisionDto.getAddress().getCountry());
                         address.setSite(siteDetails);
             siteDetails.setAddresses(address);
 
@@ -186,11 +188,12 @@ public class AddSiteServiceImpl implements AddSiteService {
                             }
                 }
             }
-
             siteDetailsRepository.save(siteDetails);
-
         }
+
     }
+
+
 }
 
 

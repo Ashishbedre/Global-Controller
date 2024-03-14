@@ -56,7 +56,7 @@ public class SiteListServiceImpl implements SiteListService {
                     List<UpdateProductVersion> updateProductVersion = updateProductVersionRepository
                             .findSingleByDeploymentIdOrderByTaskPriority(siteDetails.getDeploymentId());
                     if(updateProductVersion.size()!=0){
-                        model.setTask(updateProductVersion.get(0).getTask());
+                        model.setTask(convertTaskInFrontendView(updateProductVersion.get(0).getTask()));
                     }else{
                         model.setTask(null);
                     }
@@ -66,6 +66,21 @@ public class SiteListServiceImpl implements SiteListService {
                     return model;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public String convertTaskInFrontendView(Task task) {
+        switch (task) {
+            case Scheduled:
+                return "Scheduled for update";
+            case InProgress:
+                return "Update in progress";
+            case InQueue:
+                return "In queue";
+            case Completed:
+                return "Completed";
+            default:
+                return "";
+        }
     }
 //                    List<VersionProductDto> versionProductDtoList;
 //                    List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(siteDetails.getDeploymentId());
@@ -122,6 +137,8 @@ public class SiteListServiceImpl implements SiteListService {
         addressModel.setState(siteDetails.getAddresses().getState());
         addressModel.setStreetName(siteDetails.getAddresses().getStreetName());
         addressModel.setPinCode(siteDetails.getAddresses().getPinCode());
+//        add country
+        addressModel.setCountry(siteDetails.getAddresses().getCountry());
         data.setAddress(addressModel);
 
         //PersonModel
@@ -276,6 +293,8 @@ public class SiteListServiceImpl implements SiteListService {
                         address.setState(provisionDto.getAddress().getState());
                         address.setCity(provisionDto.getAddress().getCity());
                         address.setPinCode(provisionDto.getAddress().getPinCode());
+//                        add country
+                        address.setCountry(provisionDto.getAddress().getCountry());
                         address.setSite(siteDetails);
             siteDetails.setAddresses(address);
 

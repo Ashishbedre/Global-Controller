@@ -26,6 +26,7 @@ public class AddressModel {
 	private String pinCode;
 //	@Column(name="state")
 	private String state;
+	private String country;
 
 
 	public String getDeploymentId() {
@@ -59,14 +60,22 @@ public class AddressModel {
 		this.state = state;
 	}
 
+	public String getCountry() {
+		return country;
+	}
 
-	public AddressModel(String deploymentId, String streetName, String city, String pinCode, String state) {
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public AddressModel(String deploymentId, String streetName, String city, String pinCode, String state,String country) {
 		super();
 		this.deploymentId = deploymentId;
 		this.streetName = streetName;
 		this.city = city;
 		this.pinCode = pinCode;
 		this.state = state;
+		this.country = country;
 	}
 
 

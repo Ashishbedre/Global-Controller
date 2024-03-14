@@ -11,7 +11,7 @@ public class SiteListDto {
 	private String city;
 
 	private Boolean active;
-	private Task task;
+	private String task;
 	private List<VersionProductDto> versionControl;
 	
 	
@@ -42,11 +42,11 @@ public class SiteListDto {
 		this.active = active;
 	}
 
-	public Task getTask() {
+	public String getTask() {
 		return task;
 	}
 
-	public void setTask(Task task) {
+	public void setTask(String task) {
 		this.task = task;
 	}
 

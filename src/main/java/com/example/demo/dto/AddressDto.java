@@ -7,6 +7,7 @@ public class AddressDto {
 	private String city;
 	private String pinCode;
 	private String state;
+	private String country;
 	
 	
 	public String getStreetName() {
@@ -33,14 +34,22 @@ public class AddressDto {
 	public void setState(String state) {
 		this.state = state;
 	}
-	
-	
-	public AddressDto(String streetName, String city, String pinCode, String state) {
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public AddressDto(String streetName, String city, String pinCode, String state,String country) {
 		super();
 		this.streetName = streetName;
 		this.city = city;
 		this.pinCode = pinCode;
 		this.state = state;
+		this.country = country;
 	}
 	
 	

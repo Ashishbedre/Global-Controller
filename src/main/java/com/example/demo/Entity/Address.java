@@ -16,6 +16,8 @@ public class Address {
 
     private String state;
 
+    private String country;
+
     @ManyToOne
     @JoinColumn(name = "site_id")
     private SiteDetails site;
@@ -68,5 +70,13 @@ public class Address {
 
     public void setSite(SiteDetails site) {
         this.site = site;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }
