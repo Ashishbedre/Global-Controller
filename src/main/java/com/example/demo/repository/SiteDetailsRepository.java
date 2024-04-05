@@ -64,4 +64,8 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     @Query("SELECT COUNT(s) FROM SiteDetails s WHERE s.provision = false OR s.provision IS NULL")
     Long countUnprovisionedSites();
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE SiteDetails s SET s.updateAvailable = :updateAvailable WHERE s.deploymentId = :deploymentId")
+    void updateUpdateAvailableByDeploymentId(@Param("updateAvailable") boolean updateAvailable, @Param("deploymentId") String deploymentId);
 }

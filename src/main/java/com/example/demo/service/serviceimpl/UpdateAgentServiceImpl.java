@@ -133,15 +133,20 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         for (ProductDetailsDto productDetailsDto : updateAvailableDataDto.getProductDetails()) {
             Optional<UpdateProductVersion> optionalUpdateProductVersion = updateProductVersionRepository.findByDeploymentIdAndProductNameAndProductVersion(
                     updateAvailableDataDto.getDeploymentId(),productDetailsDto.getProductName(),productDetailsDto.getProductVersion());
-            UpdateProductVersion updateProductVersion = optionalUpdateProductVersion.get();
-            updateProductVersion.setDeploymentId(updateAvailableDataDto.getDeploymentId());
-            updateProductVersion.setProductName(productDetailsDto.getProductName());
-            updateProductVersion.setProductVersion(productDetailsDto.getProductVersion());
-            updateProductVersion.setProduct_scheduled_update(productDetailsDto.getProduct_scheduled_update());
-            updateProductVersion.setProduct_scheduled_update_dateTime(productDetailsDto.getProduct_scheduled_update_dateTime());
-            updateProductVersion.setTask(productDetailsDto.getTask());
+            if (optionalUpdateProductVersion.isPresent()) {
+                UpdateProductVersion updateProductVersion = optionalUpdateProductVersion.get();
+                updateProductVersion.setDeploymentId(updateAvailableDataDto.getDeploymentId());
+                updateProductVersion.setProductName(productDetailsDto.getProductName());
+                updateProductVersion.setProductVersion(productDetailsDto.getProductVersion());
+                updateProductVersion.setProduct_scheduled_update(productDetailsDto.getProduct_scheduled_update());
+                updateProductVersion.setProduct_scheduled_update_dateTime(productDetailsDto.getProduct_scheduled_update_dateTime());
+                updateProductVersion.setTask(productDetailsDto.getTask());
 
-            updateProductVersions.add(updateProductVersion);
+                updateProductVersions.add(updateProductVersion);
+            }else{
+                System.err.println("UpdateProductVersion not found for productName: " + productDetailsDto.getProductName() + " and productVersion: " + productDetailsDto.getProductVersion());
+
+            }
         }
         updateProductVersionRepository.saveAll(updateProductVersions);
 
@@ -149,7 +154,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
     }
 
 
-//    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000)
     void updateProductVersionAndDeleteUpdateProductVersion() {
         List<UpdateProductVersion> completedUpdates = updateProductVersionRepository.findByTask(Task.Completed);
         for (UpdateProductVersion update : completedUpdates) {
@@ -161,7 +166,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         }
     }
 
-//    @Scheduled(fixedDelay = 600000)
+    @Scheduled(fixedDelay = 10000)
     void updateProductStatus() {
         List<SiteDetails> siteDetails = siteDetailsRepository.findAll();
         for(SiteDetails updateSiteDetails : siteDetails){
@@ -178,7 +183,8 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         }
 
         // Calculate the difference between current time and lastSeen time
-        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusMinutes(10);
+//        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusSeconds(21);
 
         // Compare lastSeen with ten minutes ago
         return lastSeen.isAfter(tenMinutesAgo);

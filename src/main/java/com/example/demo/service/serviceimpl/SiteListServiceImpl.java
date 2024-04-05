@@ -340,6 +340,7 @@ public class SiteListServiceImpl implements SiteListService {
                             existingEntity.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
                             existingEntity.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
                             existingEntity.setTask(Task.InQueue);
+                            siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
                             updateProductVersionRepository.save(existingEntity);
                         },() -> {
                             UpdateProductVersion model = new UpdateProductVersion();
@@ -349,6 +350,7 @@ public class SiteListServiceImpl implements SiteListService {
                             model.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
                             model.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
                             model.setTask(Task.InQueue);
+                            siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
                             updateProductVersionRepository.save(model);
                         }
                 );
