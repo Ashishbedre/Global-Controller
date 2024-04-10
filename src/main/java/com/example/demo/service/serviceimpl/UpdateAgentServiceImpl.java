@@ -1,9 +1,7 @@
 package com.example.demo.service.serviceimpl;
 
 import ch.qos.logback.core.util.FixedDelay;
-import com.example.demo.Entity.CurrentProductVersion;
-import com.example.demo.Entity.SiteDetails;
-import com.example.demo.Entity.UpdateProductVersion;
+import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.enums.Task;
 import com.example.demo.repository.CurrentProductVersionRepository;
@@ -96,34 +94,114 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
 
     }
 
+//    @Override
+//    public UpdateAvailableDataDto getTheUpdateAvailable(String deploymentId,String tenantName) {
+//        UpdateAvailableDataDto updateAgentDataSaveDto = new UpdateAvailableDataDto();
+//        updateAgentDataSaveDto.setDeploymentId(deploymentId);
+//        updateAgentDataSaveDto.setTenantId(tenantName);
+//        if(siteDetailsRepository.existsByProvisionAndUpdateAvailableAndDeploymentId(deploymentId)){
+//            //for update lastSeen
+//            SiteDetails localDateTimeUpdate = siteDetailsRepository.findByDeploymentId(deploymentId);
+//            localDateTimeUpdate.setLastSeen(LocalDateTime.now());
+//            siteDetailsRepository.save(localDateTimeUpdate);
+//
+//            List<UpdateProductVersion> sendUpdateAgent = updateProductVersionRepository.findByDeploymentId(deploymentId);
+//            List<ProductDetailsDto> dto = new ArrayList<>();
+//            for(UpdateProductVersion send : sendUpdateAgent) {
+//                ProductDetailsDto productDetailsDto = new ProductDetailsDto();
+//                productDetailsDto.setProductName(send.getProductName());
+//                productDetailsDto.setProductVersion(send.getProductVersion());
+//                productDetailsDto.setProduct_scheduled_update(send.getProduct_scheduled_update());
+//                productDetailsDto.setProduct_scheduled_update_dateTime(send.getProduct_scheduled_update_dateTime());
+//                productDetailsDto.setTask(send.getTask());
+//                dto.add(productDetailsDto);
+//                send.setTask(Task.InQueue);
+//                updateProductVersionRepository.save(send);
+//            }
+//            updateAgentDataSaveDto.setProductDetails(dto);
+//        }
+//        return updateAgentDataSaveDto;
+//
+//    }
+
     @Override
-    public UpdateAvailableDataDto getTheUpdateAvailable(String deploymentId,String tenantName) {
-        UpdateAvailableDataDto updateAgentDataSaveDto = new UpdateAvailableDataDto();
-        updateAgentDataSaveDto.setDeploymentId(deploymentId);
-        updateAgentDataSaveDto.setTenantId(tenantName);
-        if(siteDetailsRepository.existsByProvisionAndUpdateAvailableAndDeploymentId(deploymentId)){
-            //for update lastSeen
-            SiteDetails localDateTimeUpdate = siteDetailsRepository.findByDeploymentId(deploymentId);
-            localDateTimeUpdate.setLastSeen(LocalDateTime.now());
-            siteDetailsRepository.save(localDateTimeUpdate);
+    public DeploymentUpdateInfoDto getTheUpdateAvailable(String deploymentId, String tenantName) {
+        DeploymentUpdateInfoDto deploymentUpdateInfoDto = new DeploymentUpdateInfoDto();
 
-            List<UpdateProductVersion> sendUpdateAgent = updateProductVersionRepository.findByDeploymentId(deploymentId);
-            List<ProductDetailsDto> dto = new ArrayList<>();
-            for(UpdateProductVersion send : sendUpdateAgent) {
-                ProductDetailsDto productDetailsDto = new ProductDetailsDto();
-                productDetailsDto.setProductName(send.getProductName());
-                productDetailsDto.setProductVersion(send.getProductVersion());
-                productDetailsDto.setProduct_scheduled_update(send.getProduct_scheduled_update());
-                productDetailsDto.setProduct_scheduled_update_dateTime(send.getProduct_scheduled_update_dateTime());
-                productDetailsDto.setTask(send.getTask());
-                dto.add(productDetailsDto);
-                send.setTask(Task.InQueue);
-                updateProductVersionRepository.save(send);
+        // Check if the site details exist for the given deployment ID
+        if (siteDetailsRepository.existsByProvisionAndUpdateAvailableAndDeploymentId(deploymentId)) {
+            SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
+
+            // Populate site details
+            SiteDetailsDto siteDetailsDto = new SiteDetailsDto();
+            siteDetailsDto.setSiteName(siteDetails.getSiteId()); // Assuming siteId is the site name
+            siteDetailsDto.setAddress(convertAddressDto(siteDetails.getAddresses()));
+            siteDetailsDto.setPersonOfContact(convertPersonDto(siteDetails.getPersonsOfContact()));
+
+            // Populate provision status
+            deploymentUpdateInfoDto.setProvisionStatus(siteDetails.getProvision());
+            deploymentUpdateInfoDto.setSiteDetails(siteDetailsDto);
+            // Populate update details
+            UpdateDto updateDto = new UpdateDto();
+            List<ProductDto> productDtos = new ArrayList<>();
+            List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
+            Boolean scheduledUpdate =false;
+            LocalDateTime updateDateTime = null;
+            for (UpdateProductVersion updateProductVersion : updateProductVersions) {
+                ProductDto productDto = new ProductDto();
+                productDto.setProductName(updateProductVersion.getProductName());
+                productDto.setProductVersion(updateProductVersion.getProductVersion());
+                productDtos.add(productDto);
+                if(updateProductVersion.getProduct_scheduled_update()!=null && updateProductVersion.getProduct_scheduled_update()==true){
+                    scheduledUpdate = true;
+                    updateDateTime = updateProductVersion.getProduct_scheduled_update_dateTime();
+                }
             }
-            updateAgentDataSaveDto.setProductDetails(dto);
-        }
-        return updateAgentDataSaveDto;
+            updateDto.setProducts(productDtos);
+            updateDto.setUpdateAvailable(true); // Assuming update is always available if products exist
+            updateDto.setScheduledUpdate(scheduledUpdate); // Assuming no scheduled update for now
+            updateDto.setUpdateDateTime(updateDateTime); // Assuming current date for update datetime
 
+            deploymentUpdateInfoDto.setUpdate(updateDto);
+        } else if (siteDetailsRepository.existsByDeploymentIdAndProvision(deploymentId)) {
+            SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
+
+            // Populate site details
+            SiteDetailsDto siteDetailsDto = new SiteDetailsDto();
+            siteDetailsDto.setSiteName(siteDetails.getSiteId()); // Assuming siteId is the site name
+            siteDetailsDto.setAddress(convertAddressDto(siteDetails.getAddresses()));
+            siteDetailsDto.setPersonOfContact(convertPersonDto(siteDetails.getPersonsOfContact()));
+
+            // Populate provision status
+            deploymentUpdateInfoDto.setProvisionStatus(siteDetails.getProvision());
+            deploymentUpdateInfoDto.setSiteDetails(siteDetailsDto);
+            UpdateDto updateDto = new UpdateDto();
+            updateDto.setUpdateAvailable(false);
+            deploymentUpdateInfoDto.setUpdate(updateDto);
+        } else{
+            deploymentUpdateInfoDto.setProvisionStatus(false);
+            return deploymentUpdateInfoDto;
+        }
+
+        return deploymentUpdateInfoDto;
+    }
+
+    public PersonDto convertPersonDto(Person person){
+        PersonDto personDto = new PersonDto();
+        personDto.setContact(person.getContact());
+        personDto.setEmail(person.getEmail());
+        personDto.setFullName(person.getFullName());
+        return personDto;
+    }
+
+    public AddressDto convertAddressDto(Address address){
+        AddressDto addressDto = new AddressDto();
+        addressDto.setStreetName(address.getStreetName());
+        addressDto.setCity(address.getCity());
+        addressDto.setCountry(address.getCountry());
+        addressDto.setPinCode(address.getPinCode());
+        addressDto.setState(address.getState());
+        return addressDto;
     }
 
     @Override

@@ -68,4 +68,9 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     @Modifying
     @Query("UPDATE SiteDetails s SET s.updateAvailable = :updateAvailable WHERE s.deploymentId = :deploymentId")
     void updateUpdateAvailableByDeploymentId(@Param("updateAvailable") boolean updateAvailable, @Param("deploymentId") String deploymentId);
+
+
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM SiteDetails s WHERE s.deploymentId = :deploymentId AND s.provision = true")
+    boolean existsByDeploymentIdAndProvision(@Param("deploymentId") String deploymentId);
 }
+

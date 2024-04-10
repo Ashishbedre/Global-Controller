@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.dto.DeploymentUpdateInfoDto;
 import com.example.demo.dto.UpdateAgentDataSaveDto;
 import com.example.demo.dto.UpdateAvailableDataDto;
 import com.example.demo.service.UpdateAgentService;
@@ -26,7 +27,7 @@ public class    UpdateAgentController {
     }
 //    send  the data to Update Agent
     @GetMapping("/saveDataToSiteDetailsAndCurrentProductVersion/deployment_id={deployment_id}/tenant_name={tenant_name}")
-    public ResponseEntity<UpdateAvailableDataDto> getTheUpdateAvailable(@PathVariable("deployment_id") String deploymentId,@PathVariable("tenant_name") String tenantName){
+    public ResponseEntity<DeploymentUpdateInfoDto> getTheUpdateAvailable(@PathVariable("deployment_id") String deploymentId, @PathVariable("tenant_name") String tenantName){
         return new ResponseEntity<>(updateAgentService.getTheUpdateAvailable(deploymentId,tenantName),HttpStatus.OK);
     }
 //    Update Agent update the task
