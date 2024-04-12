@@ -132,6 +132,11 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         if (siteDetailsRepository.existsByProvisionAndUpdateAvailableAndDeploymentId(deploymentId)) {
             SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
 
+
+            //for time should be save or we can say that for website is active or not
+            siteDetails.setLastSeen(LocalDateTime.now());
+            siteDetailsRepository.save(siteDetails);
+
             // Populate site details
             SiteDetailsDto siteDetailsDto = new SiteDetailsDto();
             siteDetailsDto.setSiteName(siteDetails.getSiteId()); // Assuming siteId is the site name
