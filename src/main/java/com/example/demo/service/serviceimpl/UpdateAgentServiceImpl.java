@@ -149,7 +149,10 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
             // Populate update details
             UpdateDto updateDto = new UpdateDto();
             List<ProductDto> productDtos = new ArrayList<>();
-            List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
+            //Ashish use for the TaskIsNot
+//            List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
+            // Fetch update details
+            List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentIdAndTaskIsNot(deploymentId, Task.Completed);
             Boolean scheduledUpdate =false;
             LocalDateTime updateDateTime = null;
             for (UpdateProductVersion updateProductVersion : updateProductVersions) {

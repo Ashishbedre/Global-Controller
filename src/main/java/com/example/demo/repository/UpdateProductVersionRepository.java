@@ -16,6 +16,9 @@ public interface UpdateProductVersionRepository extends JpaRepository<UpdateProd
     Optional<UpdateProductVersion> findByDeploymentIdAndProductNameAndProductVersion(String deploymentId, String productName, String productVersion);
     List<UpdateProductVersion> findByDeploymentId(String deploymentId);
 
+    List<UpdateProductVersion> findByDeploymentIdAndTaskIsNot(String deploymentId, Task task);
+
+
 //    @Query("SELECT s.productVersion FROM UpdateProductVersion s WHERE s.deploymentId = ?1 AND s.productName = ?2")
 //    String findByDeploymentIdAndProductName(String deploymentId, String productName);
 

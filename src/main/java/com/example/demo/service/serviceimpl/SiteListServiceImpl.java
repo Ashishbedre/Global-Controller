@@ -332,28 +332,35 @@ public class SiteListServiceImpl implements SiteListService {
         String deploymentId = updateProductVersion.getDeploymentId();
         String productName = updateProductVersion.getProduct_name();
 
+        String productVersion = updateProductVersion.getProduct_set_version();
+
+        Optional<CurrentProductVersion> existingEntityOptional = currentProductVersionRepository.findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
+
+
         // Search for existing entity
-        updateProductVersionRepository.findByDeploymentIdAndProductNameForUpdateProductVersion(deploymentId, productName)
-                .ifPresentOrElse(
-                        existingEntity -> {
-                            existingEntity.setProductVersion(updateProductVersion.getProduct_set_version());
-                            existingEntity.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
-                            existingEntity.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
-                            existingEntity.setTask(Task.InQueue);
-                            siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
-                            updateProductVersionRepository.save(existingEntity);
-                        },() -> {
-                            UpdateProductVersion model = new UpdateProductVersion();
-                            model.setDeploymentId(updateProductVersion.getDeploymentId());
-                            model.setProductVersion(updateProductVersion.getProduct_set_version());
-                            model.setProductName(updateProductVersion.getProduct_name());
-                            model.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
-                            model.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
-                            model.setTask(Task.InQueue);
-                            siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
-                            updateProductVersionRepository.save(model);
-                        }
-                );
+        if (!existingEntityOptional.isPresent()) {
+            updateProductVersionRepository.findByDeploymentIdAndProductNameForUpdateProductVersion(deploymentId, productName)
+                    .ifPresentOrElse(
+                            existingEntity -> {
+                                existingEntity.setProductVersion(updateProductVersion.getProduct_set_version());
+                                existingEntity.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
+                                existingEntity.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
+                                existingEntity.setTask(Task.InQueue);
+                                siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
+                                updateProductVersionRepository.save(existingEntity);
+                            }, () -> {
+                                UpdateProductVersion model = new UpdateProductVersion();
+                                model.setDeploymentId(updateProductVersion.getDeploymentId());
+                                model.setProductVersion(updateProductVersion.getProduct_set_version());
+                                model.setProductName(updateProductVersion.getProduct_name());
+                                model.setProduct_scheduled_update(updateProductVersion.getProduct_scheduled_update());
+                                model.setProduct_scheduled_update_dateTime(updateProductVersion.getProduct_scheduled_update_dateTime());
+                                model.setTask(Task.InQueue);
+                                siteDetailsRepository.updateUpdateAvailableByDeploymentId(true, deploymentId);
+                                updateProductVersionRepository.save(model);
+                            }
+                    );
+        }
     }
 }
 
