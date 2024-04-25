@@ -18,8 +18,8 @@ public class Address {
 
     private String country;
 
-    private long latitude;
-    private long longitude;
+    private double latitude;
+    private double longitude;
 
     @ManyToOne
     @JoinColumn(name = "site_id")
@@ -59,6 +59,22 @@ public class Address {
         this.pinCode = pinCode;
     }
 
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
     public String getState() {
         return state;
     }
@@ -83,19 +99,5 @@ public class Address {
         this.country = country;
     }
 
-    public long getLatitude() {
-        return latitude;
-    }
 
-    public void setLatitude(long latitude) {
-        this.latitude = latitude;
-    }
-
-    public long getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(long longitude) {
-        this.longitude = longitude;
-    }
 }

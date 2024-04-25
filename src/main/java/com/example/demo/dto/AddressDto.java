@@ -9,8 +9,8 @@ public class AddressDto {
 	private String state;
 	private String country;
 
-	private long latitude;
-	private long longitude;
+	private double latitude;
+	private double longitude;
 	
 	
 	public String getStreetName() {
@@ -46,23 +46,23 @@ public class AddressDto {
 		this.country = country;
 	}
 
-	public long getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(long latitude) {
+	public void setLatitude(double latitude) {
 		this.latitude = latitude;
 	}
 
-	public long getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(long longitude) {
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
 
-	public AddressDto(String streetName, String city, String pinCode, String state, String country,long longitude) {
+	public AddressDto(String streetName, String city, String pinCode, String state, String country, double longitude, double latitude) {
 		super();
 		this.streetName = streetName;
 		this.city = city;
@@ -70,6 +70,7 @@ public class AddressDto {
 		this.state = state;
 		this.country = country;
 		this.longitude = longitude;
+		this.latitude = latitude;
 	}
 	
 	
