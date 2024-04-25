@@ -18,6 +18,9 @@ public class Address {
 
     private String country;
 
+    private long latitude;
+    private long longitude;
+
     @ManyToOne
     @JoinColumn(name = "site_id")
     private SiteDetails site;
@@ -78,5 +81,21 @@ public class Address {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public long getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(long latitude) {
+        this.latitude = latitude;
+    }
+
+    public long getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(long longitude) {
+        this.longitude = longitude;
     }
 }

@@ -44,7 +44,11 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
             siteDetails.setDeploymentId(deploymentId);
             siteDetails.setTenantId(updateAgentDataSaveDto.getTenantId());
             siteDetailsRepository.save(siteDetails);
-            createPost();
+            try{
+            createPost(updateAgentDataSaveDto.getTenantId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         // Check if current version exists, if not save
@@ -63,10 +67,11 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         }
     }
 
+
     //Create post in
-    public void createPost() {
+    public void createPost(String tenant) {
         // Define the request URL
-        String url = "http://localhost:8081/v1/DashBoard/createPost";
+        String url = "http://localhost:8081/V1/DashBoard/createPost";
 
         // Create a WebClient instance
         WebClient webClient = WebClient.create();
@@ -75,7 +80,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         List<Notification> notifications = new ArrayList<>();
         Notification notification = new Notification();
         notification.setHeader("Site Management");
-        notification.setBody("A new Site is available for provision");
+        notification.setBody("A new Site of "+tenant+" is available for provisioning");
         notification.setReadStatus(false);
         notification.setCategory("Site Management");
         notification.setSubCategory("Add Site");
@@ -174,6 +179,10 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         } else if (siteDetailsRepository.existsByDeploymentIdAndProvision(deploymentId)) {
             SiteDetails siteDetails = siteDetailsRepository.findByDeploymentId(deploymentId);
 
+            //for time should be save or we can say that for website is active or not
+            siteDetails.setLastSeen(LocalDateTime.now());
+            siteDetailsRepository.save(siteDetails);
+
             // Populate site details
             SiteDetailsDto siteDetailsDto = new SiteDetailsDto();
             siteDetailsDto.setSiteName(siteDetails.getSiteId()); // Assuming siteId is the site name
@@ -270,7 +279,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
 
         // Calculate the difference between current time and lastSeen time
 //        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusMinutes(10);
-        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusSeconds(21);
+        LocalDateTime tenMinutesAgo = LocalDateTime.now().minusSeconds(31);
 
         // Compare lastSeen with ten minutes ago
         return lastSeen.isAfter(tenMinutesAgo);

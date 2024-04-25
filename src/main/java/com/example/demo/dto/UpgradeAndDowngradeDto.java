@@ -1,10 +1,15 @@
 package com.example.demo.dto;
 
+import com.example.demo.enums.Task;
+
 import java.util.List;
 
 public class UpgradeAndDowngradeDto {
 
     private String deploymentId;
+
+    //Ashish add this for UpgradeAndDowngrade should not be repeated update until the task is finished
+    private boolean task;
 
     List<ProductAvailableVersionDto>  product_list;
 
@@ -14,6 +19,14 @@ public class UpgradeAndDowngradeDto {
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
+    }
+
+    public boolean isTask() {
+        return task;
+    }
+
+    public void setTask(boolean task) {
+        this.task = task;
     }
 
     public List<ProductAvailableVersionDto> getProduct_list() {

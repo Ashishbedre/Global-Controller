@@ -14,6 +14,7 @@ import com.example.demo.service.AddSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -144,6 +145,9 @@ public class AddSiteServiceImpl implements AddSiteService {
                         address.setState(provisionDto.getAddress().getState());
                         address.setCity(provisionDto.getAddress().getCity());
                         address.setPinCode(provisionDto.getAddress().getPinCode());
+                        //Ashish add for latitude and longitude
+                        address.setLatitude(provisionDto.getAddress().getLatitude());
+                        address.setLongitude(provisionDto.getAddress().getLongitude());
                         //add country
                         address.setCountry(provisionDto.getAddress().getCountry());
                         address.setSite(siteDetails);
@@ -189,7 +193,43 @@ public class AddSiteServiceImpl implements AddSiteService {
                 }
             }
             siteDetailsRepository.save(siteDetails);
+            try{
+                createPost(siteDetails.getTenantId(),siteDetails.getSiteId());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
+
+    }
+
+
+    public void createPost(String tenant,String siteName) {
+        // Define the request URL
+        String url = "http://localhost:8081/V1/DashBoard/createPost";
+
+        // Create a WebClient instance
+        WebClient webClient = WebClient.create();
+
+        // Create a Notification object representing the request body
+        List<Notification> notifications = new ArrayList<>();
+        Notification notification = new Notification();
+        notification.setHeader("Site Management");
+        notification.setBody(siteName+" has been provisioned for "+tenant+" successfully");
+        notification.setReadStatus(false);
+        notification.setCategory("Site Management");
+        notification.setSubCategory("Site List");
+        notifications.add(notification);
+
+        // Make the POST request
+        String response = webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(notifications)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+
 
     }
 

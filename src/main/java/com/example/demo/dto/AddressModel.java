@@ -28,6 +28,11 @@ public class AddressModel {
 	private String state;
 	private String country;
 
+	private long latitude;
+	private long longitude;
+
+
+
 
 	public String getDeploymentId() {
 		return deploymentId;
@@ -68,7 +73,23 @@ public class AddressModel {
 		this.country = country;
 	}
 
-	public AddressModel(String deploymentId, String streetName, String city, String pinCode, String state,String country) {
+	public long getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(long latitude) {
+		this.latitude = latitude;
+	}
+
+	public long getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(long longitude) {
+		this.longitude = longitude;
+	}
+
+	public AddressModel(String deploymentId, String streetName, String city, String pinCode, String state, String country,long longitude,long latitude) {
 		super();
 		this.deploymentId = deploymentId;
 		this.streetName = streetName;
@@ -76,6 +97,8 @@ public class AddressModel {
 		this.pinCode = pinCode;
 		this.state = state;
 		this.country = country;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 

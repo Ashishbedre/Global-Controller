@@ -137,6 +137,9 @@ public class SiteListServiceImpl implements SiteListService {
         addressModel.setState(siteDetails.getAddresses().getState());
         addressModel.setStreetName(siteDetails.getAddresses().getStreetName());
         addressModel.setPinCode(siteDetails.getAddresses().getPinCode());
+        //        Ashish add latitude and longitude
+        addressModel.setLatitude(siteDetails.getAddresses().getLatitude());
+        addressModel.setLongitude(siteDetails.getAddresses().getLongitude());
 //        add country
         addressModel.setCountry(siteDetails.getAddresses().getCountry());
         data.setAddress(addressModel);
@@ -155,11 +158,24 @@ public class SiteListServiceImpl implements SiteListService {
     @Override
     public UpgradeAndDowngradeDto getListOfVersion(String deploymentId) {
         UpgradeAndDowngradeDto upgradeAndDowngradeDto = new UpgradeAndDowngradeDto();
+        List<UpdateProductVersion> updateProductVersion = updateProductVersionRepository
+                .findSingleByDeploymentIdOrderByTaskPriority(deploymentId);
+
+        if (!updateProductVersion.isEmpty()) {
+//            Task task = updateProductVersion.get(0).getTask();
+//            upgradeAndDowngradeDto.setTask(task != Task.Scheduled);
+            upgradeAndDowngradeDto.setTask(false);
+        } else {
+            upgradeAndDowngradeDto.setTask(true);
+        }
+
         List<VersionControlMicroDto> versionControlMicroDtoList = converttoVersionControlMicroDto(deploymentId);
         upgradeAndDowngradeDto.setDeploymentId(deploymentId);
         upgradeAndDowngradeDto.setProduct_list(upgradeAndDowngrade(versionControlMicroDtoList,deploymentId));
         return upgradeAndDowngradeDto;
     }
+
+
 //        List<VersionControlMicroDto> versionControlMicroDtoList;
 //
 //        List<UpdateProductVersion> updateProductVersions = updateProductVersionRepository.findByDeploymentId(deploymentId);
@@ -293,6 +309,9 @@ public class SiteListServiceImpl implements SiteListService {
                         address.setState(provisionDto.getAddress().getState());
                         address.setCity(provisionDto.getAddress().getCity());
                         address.setPinCode(provisionDto.getAddress().getPinCode());
+            //        Ashish add latitude and longitude
+                        address.setLongitude(provisionDto.getAddress().getLongitude());
+                        address.setLatitude(provisionDto.getAddress().getLatitude());
 //                        add country
                         address.setCountry(provisionDto.getAddress().getCountry());
                         address.setSite(siteDetails);
