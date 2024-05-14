@@ -51,4 +51,18 @@ public class SiteListController {
     public void saveVersionData(@RequestBody List<VersionControlDataModel> versionControlDataModel) {
         siteListService.saveVersionData(versionControlDataModel);
     }
+
+//     to get the list of SiteName by tenant name
+    @GetMapping("/provision/site_list/TenantName={tenant_name}")
+    public  List<SiteDetailsResponseDTO>  getSiteName(@PathVariable("tenant_name") String tenantName) {
+        return siteListService.getSiteDetailsByTenantId(tenantName);
+    }
+
+    //     to get the list of SiteName by tenant name
+    @GetMapping("/provision/site_list/get_all_site_name")
+    public  List<SiteDetailsResponseDTO>  getSiteName() {
+        return siteListService.getSiteDetailsByTenantId();
+    }
+
+
 }

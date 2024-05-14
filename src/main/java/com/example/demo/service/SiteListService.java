@@ -12,5 +12,8 @@ public interface SiteListService {
     public void deleteExistingSite(String deploymentId);
     public void saveVersionData(List<VersionControlDataModel> list);
 
+    public List<SiteDetailsResponseDTO> getSiteDetailsByTenantId(String tenantId);
+    public List<SiteDetailsResponseDTO> getSiteDetailsByTenantId();
+
 
 }

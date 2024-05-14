@@ -65,7 +65,12 @@ public class AddSiteServiceImpl implements AddSiteService {
                             .map(currentProductVersion -> {
                                 ProductDto productDto = new ProductDto();
                                 productDto.setProductName(currentProductVersion.getProductName());
-                                productDto.setProductVersion(currentProductVersion.getProductVersion());
+                                //Ashish change for tag is null
+                                if(currentProductVersion.getProductVersion()==null){
+                                    productDto.setProductVersion("Not Deployed");
+                                }else{
+                                    productDto.setProductVersion(currentProductVersion.getProductVersion());
+                                }
                                 return productDto;
                             })
                             .collect(Collectors.toList());
@@ -108,7 +113,14 @@ public class AddSiteServiceImpl implements AddSiteService {
         for (DockerVersionInformationDto dockerVersionInformationDto : dockerVersionInformationDtoList) {
             VersionUpgradeDto versionUpgradeDto = new VersionUpgradeDto();
             versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
-            versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
+            //Ashish change for version is null
+            if(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct())==null){
+                versionUpgradeDto.setProduct_current_version("Not Deployed");
+            }else{
+                versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
+
+            }
+//            versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
 
             List<VersionInformation> versionInformationList = dockerVersionInformationDto.getVersions().stream()
                     .map(versionInformation -> {

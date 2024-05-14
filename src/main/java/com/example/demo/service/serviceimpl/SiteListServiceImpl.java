@@ -347,6 +347,61 @@ public class SiteListServiceImpl implements SiteListService {
         }
     }
 
+    @Override
+    public List<SiteDetailsResponseDTO> getSiteDetailsByTenantId(String tenantId) {
+        List<Object[]> results = siteDetailsRepository.findSiteDetailsByTenantId(tenantId);
+        List<SiteDetailsResponseDTO> siteDetailsList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String siteId = (String) result[0];
+            Address address = (Address) result[1];
+            Person personOfContact = (Person) result[2];
+
+            SiteDetailsResponseDTO siteDetailsDTO = new SiteDetailsResponseDTO(siteId, mapAddressToDto(address), mapPersonToDto(personOfContact));
+            siteDetailsList.add(siteDetailsDTO);
+        }
+
+        return siteDetailsList;
+    }
+
+    public static AddressDto mapAddressToDto(Address address) {
+        AddressDto addressDto = new AddressDto();
+        addressDto.setStreetName(address.getStreetName());
+        addressDto.setCity(address.getCity());
+        addressDto.setPinCode(address.getPinCode());
+        addressDto.setState(address.getState());
+        addressDto.setCountry(address.getCountry());
+        addressDto.setLatitude(address.getLatitude());
+        addressDto.setLongitude(address.getLongitude());
+        return addressDto;
+    }
+    public PersonDto mapPersonToDto(Person person) {
+        PersonDto personDto = new PersonDto();
+        personDto.setFullName(person.getFullName());
+        personDto.setContact(person.getContact());
+        personDto.setEmail(person.getEmail());
+        return personDto;
+    }
+
+    @Override
+    public List<SiteDetailsResponseDTO> getSiteDetailsByTenantId() {
+        List<Object[]> results = siteDetailsRepository.findSiteDetailsByTenantId();
+        List<SiteDetailsResponseDTO> siteDetailsList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String siteId = (String) result[0];
+            Address address = (Address) result[1];
+            Person personOfContact = (Person) result[2];
+
+            SiteDetailsResponseDTO siteDetailsDTO = new SiteDetailsResponseDTO(siteId, mapAddressToDto(address), mapPersonToDto(personOfContact));
+            siteDetailsList.add(siteDetailsDTO);
+        }
+
+        return siteDetailsList;
+    }
+
+
+
     private void saveOrUpdate(VersionControlDataModel updateProductVersion) {
         String deploymentId = updateProductVersion.getDeploymentId();
         String productName = updateProductVersion.getProduct_name();

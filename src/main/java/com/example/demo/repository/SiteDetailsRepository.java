@@ -72,5 +72,10 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
 
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM SiteDetails s WHERE s.deploymentId = :deploymentId AND s.provision = true")
     boolean existsByDeploymentIdAndProvision(@Param("deploymentId") String deploymentId);
+
+    @Query("SELECT s.siteId, a, p FROM SiteDetails s JOIN s.addresses a JOIN s.personsOfContact p WHERE s.tenantId = :tenantId")
+    List<Object[]> findSiteDetailsByTenantId(String tenantId);
+    @Query("SELECT s.siteId, a, p FROM SiteDetails s JOIN s.addresses a JOIN s.personsOfContact p")
+    List<Object[]> findSiteDetailsByTenantId();
 }
 
