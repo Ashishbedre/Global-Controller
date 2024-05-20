@@ -77,5 +77,8 @@ public interface SiteDetailsRepository extends JpaRepository<SiteDetails, Long> 
     List<Object[]> findSiteDetailsByTenantId(String tenantId);
     @Query("SELECT s.siteId, a, p FROM SiteDetails s JOIN s.addresses a JOIN s.personsOfContact p")
     List<Object[]> findSiteDetailsByTenantId();
+
+    @Query("SELECT MAX(e.kafka) FROM SiteDetails e")
+    Integer findMaxKafka();
 }
 

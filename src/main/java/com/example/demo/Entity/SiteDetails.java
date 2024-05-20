@@ -32,6 +32,8 @@ public class SiteDetails {
 
     private LocalDateTime lastSeen;
 
+    private int kafka;
+
     public Long getId() {
         return id;
     }
@@ -110,5 +112,13 @@ public class SiteDetails {
 
     public void setLastSeen(LocalDateTime lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public int getKafka() {
+        return kafka;
+    }
+
+    public void setKafka(int kafka) {
+        this.kafka = kafka;
     }
 }

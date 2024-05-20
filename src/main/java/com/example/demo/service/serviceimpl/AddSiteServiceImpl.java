@@ -149,6 +149,8 @@ public class AddSiteServiceImpl implements AddSiteService {
             siteDetails.setProvision(true);
             siteDetails.setUpdateAvailable(false);
             siteDetails.setActive(false);
+            //ashish change for kafka
+            siteDetails.setKafka(siteDetailsRepository.findMaxKafka()+1);
 
             // Convert AddressDto list to Address list
                         Address address = new Address();

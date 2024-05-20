@@ -145,6 +145,8 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
             // Populate site details
             SiteDetailsDto siteDetailsDto = new SiteDetailsDto();
             siteDetailsDto.setSiteName(siteDetails.getSiteId()); // Assuming siteId is the site name
+            //Ashish add for kafka use
+            siteDetailsDto.setKafkaPartition(siteDetails.getKafka());
             siteDetailsDto.setAddress(convertAddressDto(siteDetails.getAddresses()));
             siteDetailsDto.setPersonOfContact(convertPersonDto(siteDetails.getPersonsOfContact()));
 
