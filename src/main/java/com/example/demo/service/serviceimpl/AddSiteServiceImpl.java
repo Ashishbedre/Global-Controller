@@ -38,6 +38,9 @@ public class AddSiteServiceImpl implements AddSiteService {
     @Value("${getUpgradeVersion.api.url}")
     private String getUpgradeVersion;
 
+    @Value("${Notification.api.url}")
+    private String createNotification;
+
     @Override
     public List<TenantDto> getListOfTenant() {
         List<TenantDto> tenantDtos = siteDetailsRepository.findAllDistinctTenantIds()
@@ -66,8 +69,8 @@ public class AddSiteServiceImpl implements AddSiteService {
                                 ProductDto productDto = new ProductDto();
                                 productDto.setProductName(currentProductVersion.getProductName());
                                 //Ashish change for tag is null
-                                if(currentProductVersion.getProductVersion()==null){
-                                    productDto.setProductVersion("Not Deployed");
+                                if(currentProductVersion.getProductVersion()==null|| currentProductVersion.getProductVersion().equals("null")){
+                                    productDto.setProductVersion(null);
                                 }else{
                                     productDto.setProductVersion(currentProductVersion.getProductVersion());
                                 }
@@ -114,8 +117,9 @@ public class AddSiteServiceImpl implements AddSiteService {
             VersionUpgradeDto versionUpgradeDto = new VersionUpgradeDto();
             versionUpgradeDto.setProduct_name(dockerVersionInformationDto.getProduct());
             //Ashish change for version is null
-            if(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct())==null){
-                versionUpgradeDto.setProduct_current_version("Not Deployed");
+            if(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct())==null||
+                    currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()).equals("null")){
+                versionUpgradeDto.setProduct_current_version(null);
             }else{
                 versionUpgradeDto.setProduct_current_version(currentProductVersionRepository.findVersionNameByDeploymentIdAndProductName(deploymentId, dockerVersionInformationDto.getProduct()));
 
@@ -190,7 +194,8 @@ public class AddSiteServiceImpl implements AddSiteService {
                 String productVersion = versionSetProductDto.getProductSetVersion();
                 Optional<CurrentProductVersion> currentVersionOptional = currentProductVersionRepository
                         .findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
-                if (!currentVersionOptional.isPresent()) {
+                if (!currentVersionOptional.isPresent() && !productVersion.equals("Not Deployed") && !productVersion.equals("null")
+                        && productVersion!=null) {
                     Optional<UpdateProductVersion> checkUpdateProductVersion = updateProductVersionRepository
                             .findByDeploymentIdAndProductNameAndProductVersion(deploymentId, productName, productVersion);
                             if(!checkUpdateProductVersion.isPresent()) {
@@ -217,9 +222,14 @@ public class AddSiteServiceImpl implements AddSiteService {
     }
 
 
+//    public boolean checkCompatible(){
+//
+//    }
+
+
     public void createPost(String tenant,String siteName) {
         // Define the request URL
-        String url = "http://localhost:8081/V1/DashBoard/createPost";
+        String url = createNotification;
 
         // Create a WebClient instance
         WebClient webClient = WebClient.create();

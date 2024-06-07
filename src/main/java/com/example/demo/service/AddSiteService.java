@@ -14,4 +14,6 @@ public interface AddSiteService {
 
     public void saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId);
     public VersionUpdateControlDto getListOfUpdatedVersion(String deploymentId);
+
+//    public boolean checkCompatible();
 }

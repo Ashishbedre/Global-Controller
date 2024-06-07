@@ -9,6 +9,7 @@ import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.UpdateAgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,6 +33,8 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
 
     @Autowired
     UpdateProductVersionRepository updateProductVersionRepository;
+    @Value("${Notification.api.url}")
+    private String createNotification;
 
     @Override
     public void saveDataToSiteDetailsAndCurrentProductVersion(UpdateAgentDataSaveDto updateAgentDataSaveDto) {
@@ -71,7 +74,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
     //Create post in
     public void createPost(String tenant) {
         // Define the request URL
-        String url = "http://localhost:8081/V1/DashBoard/createPost";
+        String url = createNotification;
 
         // Create a WebClient instance
         WebClient webClient = WebClient.create();

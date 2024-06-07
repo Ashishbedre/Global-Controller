@@ -117,8 +117,16 @@ public class SiteListServiceImpl implements SiteListService {
 
             VersionProductDto versionControlMicroDto = new VersionProductDto();
             versionControlMicroDto.setProductName(currentProductVersion.getProductName());
-            versionControlMicroDto.setProductVersion(updateProductVersion != null ? updateProductVersion.getProductVersion()
-                    : currentProductVersion.getProductVersion());
+//            versionControlMicroDto.setProductVersion(updateProductVersion != null ? updateProductVersion.getProductVersion()
+//                    : currentProductVersion.getProductVersion());
+//           Ashish add for null handle
+            String productVersion = updateProductVersion != null ? updateProductVersion.getProductVersion()
+                    : currentProductVersion.getProductVersion();
+            if (productVersion == null || "null".equals(productVersion)) {
+                versionControlMicroDto.setProductVersion(null);
+            } else {
+                versionControlMicroDto.setProductVersion(productVersion);
+            }
 
             return versionControlMicroDto;
         }).collect(Collectors.toList());
@@ -251,7 +259,15 @@ public class SiteListServiceImpl implements SiteListService {
             object.setTag(versionControlMicroDto.getTag());
             listAdd.add(object);
             productAvailableVersionDto.setProduct_name(versionControlMicroDto.getRepo());
-            productAvailableVersionDto.setProduct_current_version(versionControlMicroDto.getTag());
+//            productAvailableVersionDto.setProduct_current_version(versionControlMicroDto.getTag());
+//            Ashish add for null handle
+            String tag = versionControlMicroDto.getTag();
+            if (tag == null || "null".equals(tag)) {
+                productAvailableVersionDto.setProduct_current_version(null);
+            } else {
+                productAvailableVersionDto.setProduct_current_version(tag);
+            }
+
             WebClient webClient = WebClient.create();
 
             List<VersionInformation> versionInformationsUpgradeVersion = webClient.post()
