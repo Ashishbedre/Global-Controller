@@ -1,9 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.ProvisionSiteSSDto;
-import com.example.demo.dto.TenantDto;
-import com.example.demo.dto.VersionAddSiteDto;
-import com.example.demo.dto.VersionUpdateControlDto;
+import com.example.demo.dto.*;
+import com.example.demo.dto.BackendPackage.ProductListResponcedto;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ public interface AddSiteService {
 
     public List<VersionAddSiteDto> getAllDataProduct(String tenantId);
 
-    public void saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId);
+    public List<ProductListResponcedto> saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId);
     public VersionUpdateControlDto getListOfUpdatedVersion(String deploymentId);
 
 //    public boolean checkCompatible();

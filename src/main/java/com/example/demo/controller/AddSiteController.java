@@ -1,19 +1,21 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.dto.ProvisionSiteSSDto;
-import com.example.demo.dto.TenantDto;
-import com.example.demo.dto.VersionAddSiteDto;
-import com.example.demo.dto.VersionUpdateControlDto;
+import com.example.demo.dto.*;
+import com.example.demo.dto.BackendPackage.ProductListResponcedto;
 import com.example.demo.service.AddSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1")
 @CrossOrigin
+@PreAuthorize("hasAnyRole('client_user', 'client_admin')")
 public class AddSiteController {
 
     @Autowired
@@ -39,8 +41,8 @@ public class AddSiteController {
 
     // To add a new site in the provision list
     @PostMapping("/provision/add_site/post_add_site/deployment_id={deployment_id}/tenant_id={tenant_id}")
-    public void saveAddNewSiteData(@RequestBody ProvisionSiteSSDto provisionDto, @PathVariable("deployment_id") String deploymentId, @PathVariable("tenant_id") String tenantId) {
-        addSiteService.saveAddNewSiteData(provisionDto, deploymentId, tenantId);
+    public List<ProductListResponcedto> saveAddNewSiteData(@RequestBody ProvisionSiteSSDto provisionDto, @PathVariable("deployment_id") String deploymentId, @PathVariable("tenant_id") String tenantId) {
+       return addSiteService.saveAddNewSiteData(provisionDto, deploymentId, tenantId);
     }
 
 }

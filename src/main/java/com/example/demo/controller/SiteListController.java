@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.*;
+import com.example.demo.dto.BackendPackage.ProductListResponcedto;
 import com.example.demo.service.SiteListService;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1")
 @CrossOrigin
+@PreAuthorize("hasAnyRole('client_user', 'client_admin')")
 public class SiteListController {
 
 
@@ -48,8 +52,8 @@ public class SiteListController {
 
     // To save the details of the version in the site list.
     @PostMapping("/provision/site_list/post_set_version_provisioned")
-    public void saveVersionData(@RequestBody List<VersionControlDataModel> versionControlDataModel) {
-        siteListService.saveVersionData(versionControlDataModel);
+    public List<ProductListResponcedto> saveVersionData(@RequestBody List<VersionControlDataModel> versionControlDataModel) {
+        return siteListService.saveVersionData(versionControlDataModel);
     }
 
 //     to get the list of SiteName by tenant name

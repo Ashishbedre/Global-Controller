@@ -36,6 +36,9 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
     @Value("${Notification.api.url}")
     private String createNotification;
 
+//    private  TokenService tokenService;
+//    String accessToken = tokenService.getAccessToken();
+
     @Override
     public void saveDataToSiteDetailsAndCurrentProductVersion(UpdateAgentDataSaveDto updateAgentDataSaveDto) {
         String deploymentId = updateAgentDataSaveDto.getDeploymentId();
@@ -93,6 +96,7 @@ public class UpdateAgentServiceImpl implements UpdateAgentService {
         String response = webClient.post()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
+//                .headers(headers -> headers.setBearerAuth(accessToken))
                 .bodyValue(notifications)
                 .retrieve()
                 .bodyToMono(String.class)

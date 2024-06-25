@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.Entity.UpdateProductVersion;
 import com.example.demo.dto.DashBoardCountDto;
 import com.example.demo.dto.UpdateAndDowngradeMonitorDto;
 
@@ -13,6 +12,7 @@ public interface DashBoardService {
     List<UpdateAndDowngradeMonitorDto> ListOfUpdateProductVersion();
 
 
+    interface CompatibleImp  {
 
-
+    }
 }

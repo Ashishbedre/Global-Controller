@@ -3,6 +3,7 @@ package com.example.demo.service.serviceimpl;
 import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
+import com.example.demo.dto.BackendPackage.ProductListResponcedto;
 import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
 //import com.example.demo.model.AgentModel;
@@ -11,10 +12,12 @@ import com.example.demo.repository.CurrentProductVersionRepository;
 import com.example.demo.repository.SiteDetailsRepository;
 import com.example.demo.repository.UpdateProductVersionRepository;
 import com.example.demo.service.AddSiteService;
+import com.example.demo.service.Compatible;
+import com.example.demo.service.TokenService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -35,11 +38,21 @@ public class AddSiteServiceImpl implements AddSiteService {
     @Autowired
     UpdateProductVersionRepository updateProductVersionRepository;
 
+    @Autowired
+    Compatible compatible;
+
+    @Autowired
+    TokenService tokenService;
+
+
     @Value("${getUpgradeVersion.api.url}")
     private String getUpgradeVersion;
 
     @Value("${Notification.api.url}")
     private String createNotification;
+
+
+
 
     @Override
     public List<TenantDto> getListOfTenant() {
@@ -104,9 +117,12 @@ public class AddSiteServiceImpl implements AddSiteService {
 
         WebClient webClient = WebClient.create();
 
+        String accessToken = tokenService.getAccessToken();
+
         List<DockerVersionInformationDto> dockerVersionInformationDtoList = webClient.post()
                 .uri(getUpgradeVersion)
                 .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .bodyValue(versionControlDtoList)
                 .retrieve()
                 .bodyToFlux(DockerVersionInformationDto.class)
@@ -143,7 +159,13 @@ public class AddSiteServiceImpl implements AddSiteService {
     }
 
     @Override
-    public void saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId) {
+    public List<ProductListResponcedto> saveAddNewSiteData(ProvisionSiteSSDto provisionDto, String deploymentId, String tenantId) {
+        JsonNode check = compatible.checkCompatible(provisionDto);
+        List<ProductListResponcedto> dataProcess = compatible.processCompatibilityData(check);
+        if(dataProcess.get(0).isCompatible()==false ){
+                return dataProcess;
+        }
+
         SiteDetails siteDetails = siteDetailsRepository.findByDeploymentIdAndTenantId(deploymentId, tenantId);
         if (siteDetails != null) {
             // Map fields from ProvisionSiteSSDto to SiteDetails
@@ -219,12 +241,11 @@ public class AddSiteServiceImpl implements AddSiteService {
             }
         }
 
+
+        return dataProcess;
     }
 
 
-//    public boolean checkCompatible(){
-//
-//    }
 
 
     public void createPost(String tenant,String siteName) {
@@ -233,6 +254,7 @@ public class AddSiteServiceImpl implements AddSiteService {
 
         // Create a WebClient instance
         WebClient webClient = WebClient.create();
+
 
         // Create a Notification object representing the request body
         List<Notification> notifications = new ArrayList<>();
@@ -243,11 +265,12 @@ public class AddSiteServiceImpl implements AddSiteService {
         notification.setCategory("Site Management");
         notification.setSubCategory("Site List");
         notifications.add(notification);
-
+        String accessToken = tokenService.getAccessToken();
         // Make the POST request
         String response = webClient.post()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers -> headers.setBearerAuth(accessToken))
                 .bodyValue(notifications)
                 .retrieve()
                 .bodyToMono(String.class)

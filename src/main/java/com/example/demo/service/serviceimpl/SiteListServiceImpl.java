@@ -3,11 +3,15 @@ package com.example.demo.service.serviceimpl;
 import com.example.demo.Entity.*;
 import com.example.demo.dto.*;
 import com.example.demo.dto.BackendPackage.DockerVersionInformationDto;
+import com.example.demo.dto.BackendPackage.ProductListResponcedto;
 import com.example.demo.dto.BackendPackage.VersionControlMicroDto;
 import com.example.demo.dto.BackendPackage.VersionInformation;
 import com.example.demo.enums.Task;
 import com.example.demo.repository.*;
+import com.example.demo.service.Compatible;
 import com.example.demo.service.SiteListService;
+import com.example.demo.service.TokenService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,10 +43,17 @@ public class SiteListServiceImpl implements SiteListService {
     @Autowired
     UpdateProductVersionRepository updateProductVersionRepository;
 
+    @Autowired
+    Compatible compatible;
+
     @Value("${getUpgradeVersion.api.url}")
     private String getUpgradeVersion;
     @Value("${getDowngradeVersion.api.url}")
     private String getDowngradeVersion;
+
+    @Autowired
+    private TokenService tokenService;
+//    String accessToken = tokenService.getAccessToken();
 
     @Override
     public List<SiteListDto> getAllSiteList(String tenantId) {
@@ -269,10 +280,11 @@ public class SiteListServiceImpl implements SiteListService {
             }
 
             WebClient webClient = WebClient.create();
-
+            String accessToken = tokenService.getAccessToken();
             List<VersionInformation> versionInformationsUpgradeVersion = webClient.post()
                     .uri(getUpgradeVersion)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .headers(headers -> headers.setBearerAuth(accessToken))
                     .bodyValue(listAdd)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
@@ -288,6 +300,7 @@ public class SiteListServiceImpl implements SiteListService {
             List<VersionInformation> versionInformationsDowngradeVersion = webClient.post()
                     .uri(getDowngradeVersion)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .headers(headers -> headers.setBearerAuth(accessToken))
                     .bodyValue(listAdd)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<DockerVersionInformationDto>>() {})
@@ -357,10 +370,61 @@ public class SiteListServiceImpl implements SiteListService {
     }
 
     @Override
-    public void saveVersionData(List<VersionControlDataModel> list) {
-        for (VersionControlDataModel versionControlDataModel : list) {
-                saveOrUpdate(versionControlDataModel);
+    public List<ProductListResponcedto> saveVersionData(List<VersionControlDataModel> list) {
+        List<ProductListResponcedto> dataProcess = checkForCompatible(list);
+        if(dataProcess.isEmpty() || dataProcess.get(0).isCompatible()==false){
+            return dataProcess;
+        }else{
+            for (VersionControlDataModel versionControlDataModel : list) {
+                    saveOrUpdate(versionControlDataModel);
+            }
+            return dataProcess;
         }
+    }
+
+    public List<ProductListResponcedto> checkForCompatible(List<VersionControlDataModel> list){
+        if(list.size()==1){
+            String product1 = list.get(0).getProduct_name();
+            String version1 = list.get(0).getProduct_set_version();
+            String product2 = "null";
+            String version2 = "null";
+            List<CurrentProductVersion> check = currentProductVersionRepository.findByDeploymentId(list.get(0).getDeploymentId());
+            for(CurrentProductVersion findTheProduct : check){
+                String findProduct = findTheProduct.getProductName() != null ? findTheProduct.getProductName() : "null";
+                if (!findProduct.equals(product1)){
+                    product2 = findTheProduct.getProductName();
+                    version2 = findTheProduct.getProductVersion();
+                    break;
+                }
+            }
+            List<VersionSetProductDto> versionControl = new ArrayList<>();
+            versionControl.add(new VersionSetProductDto(product1, version1));
+
+//            if (product2 != null && version2 != null) {
+                versionControl.add(new VersionSetProductDto(product2, version2));
+//            }
+            JsonNode jsonString = compatible.checkCompatibleUrl(versionControl);
+            List<ProductListResponcedto> dataProcess = compatible.processCompatibilityData(jsonString);
+            return dataProcess;
+//            if(dataProcess.get(0).isCompatible()==false ){
+//                return dataProcess;
+//            }
+        } else if (list.size()==2) {
+            JsonNode jsonString = compatible.checkCompatibleUrl(convertToVersionSetProductDtoList(list));
+            List<ProductListResponcedto> dataProcess = compatible.processCompatibilityData(jsonString);
+            if(dataProcess.get(0).isCompatible()==false ){
+                return dataProcess;
+            }
+        }
+
+        return new ArrayList<>();
+
+    }
+
+    public static List<VersionSetProductDto> convertToVersionSetProductDtoList(List<VersionControlDataModel> versionControlDataModels) {
+        return versionControlDataModels.stream()
+                .map(model -> new VersionSetProductDto(model.getProduct_name(), model.getProduct_set_version()))
+                .collect(Collectors.toList());
     }
 
     @Override

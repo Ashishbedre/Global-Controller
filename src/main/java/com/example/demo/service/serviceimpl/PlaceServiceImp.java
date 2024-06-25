@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 public class PlaceServiceImp implements PlaceService {
     private final WebClient webClient;
     private String accessToken;
+
     public PlaceServiceImp() {
         this.webClient = WebClient.create("https://www.universal-tutorial.com/api");
     }
