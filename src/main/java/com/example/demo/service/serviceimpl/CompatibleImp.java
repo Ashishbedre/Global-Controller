@@ -61,7 +61,7 @@ public class CompatibleImp implements Compatible {
         List<ProductListResponcedto> productList = new ArrayList<>();
 
         ObjectMapper objectMapper = new ObjectMapper();
-
+        String product = "";
         // Access the "compatibility" array
         JsonNode compatibilityArray = jsonString.get("compatibility");
         if (compatibilityArray != null && compatibilityArray.isArray()) {
@@ -79,7 +79,11 @@ public class CompatibleImp implements Compatible {
                         // Retrieve fields from each product object
                         String productName = productNode.path("product").asText();
                         String productVersion = productNode.path("version").asText();
-
+                        if(productName.equals("niralos-5g-core")){
+                                product = "niralos-local-sdn";
+                        }else{
+                                product = "niralos-5g-core";
+                        }
                         // Create ProductDto object and add to list
                         ProductDto productDto = new ProductDto(productName, productVersion);
                         productDtoList.add(productDto);
@@ -89,6 +93,7 @@ public class CompatibleImp implements Compatible {
                 // Create ProductListResponseDto object and set fields
                 ProductListResponcedto responseDto = new ProductListResponcedto();
                 responseDto.setCompatible(compatible);
+                responseDto.setWantedToUpdate(product);
                 responseDto.setProductsWithGreaterId(productDtoList);
 
                 productList.add(responseDto);

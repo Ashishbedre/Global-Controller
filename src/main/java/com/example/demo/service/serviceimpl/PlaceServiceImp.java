@@ -32,7 +32,7 @@ public class PlaceServiceImp implements PlaceService {
                 });
     }
 //    @Scheduled(fixedRate = 6 * 60 * 60 * 1000)
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 300000)
     public void  generateToken(){
         accessToken = getAccessToken().block();
         System.out.println(accessToken);

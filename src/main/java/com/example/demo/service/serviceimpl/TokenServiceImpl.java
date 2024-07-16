@@ -28,6 +28,11 @@ public class TokenServiceImpl implements TokenService {
         retrieveInitialTokens();
     }
 
+    @Scheduled(cron = "0 0 0/9 * * *")
+    public void retrieveScheduledTokens() {
+        retrieveInitialTokens();
+    }
+
     public void retrieveInitialTokens() {
         WebClient webClient = WebClient.create();
 

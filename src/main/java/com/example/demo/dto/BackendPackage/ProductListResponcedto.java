@@ -7,6 +7,8 @@ import java.util.List;
 
 public class ProductListResponcedto {
     private boolean isCompatible;
+
+    private String wantedToUpdate;
     private List<ProductDto> productsWithGreaterId;
 
     public boolean isCompatible() {
@@ -15,6 +17,14 @@ public class ProductListResponcedto {
 
     public void setCompatible(boolean compatible) {
         isCompatible = compatible;
+    }
+
+    public String getWantedToUpdate() {
+        return wantedToUpdate;
+    }
+
+    public void setWantedToUpdate(String wantedToUpdate) {
+        this.wantedToUpdate = wantedToUpdate;
     }
 
     public List<ProductDto> getProductsWithGreaterId() {

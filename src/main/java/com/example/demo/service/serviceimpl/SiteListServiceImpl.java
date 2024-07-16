@@ -372,7 +372,8 @@ public class SiteListServiceImpl implements SiteListService {
     @Override
     public List<ProductListResponcedto> saveVersionData(List<VersionControlDataModel> list) {
         List<ProductListResponcedto> dataProcess = checkForCompatible(list);
-        if(dataProcess.isEmpty() || dataProcess.get(0).isCompatible()==false){
+        Boolean compare = dataProcess.get(0).isCompatible();
+        if(dataProcess.isEmpty() || compare==false){
             return dataProcess;
         }else{
             for (VersionControlDataModel versionControlDataModel : list) {
@@ -413,6 +414,8 @@ public class SiteListServiceImpl implements SiteListService {
             JsonNode jsonString = compatible.checkCompatibleUrl(convertToVersionSetProductDtoList(list));
             List<ProductListResponcedto> dataProcess = compatible.processCompatibilityData(jsonString);
             if(dataProcess.get(0).isCompatible()==false ){
+                return dataProcess;
+            } else if (dataProcess.get(0).isCompatible()==true) {
                 return dataProcess;
             }
         }
